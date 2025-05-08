@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Vittavento Article Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Vittavento Article Generator</h1>
+
+        <form method="POST" action="{{ url_for('main.generator') }}">
+            <div class="code-container">
+
+                <div class="symbol-block group group-1">
+                  <select class="symbol-select" name="view" onchange="if (this.value === 'add_new') window.location.href='/add_view'">
+                    {% for v in views %}
+                      <option value="{{ v.name }}">{{ v.name }}</option>
+                    {% endfor %}
+                    <option value="add_new">+ Добавить новый вид</option>
+                  </select>
+                </div>
+
+                <div class="symbol-block group group-2">
+                    <select name="category" class="symbol-select">
+                        <option>BC</option>
+                        <option>MI</option>
+                        <option>GL</option>
+                    </select>
+                </div>
+
+                <div class="symbol-block single">
+                    <select name="level" class="symbol-select">
+                       <option value="1">1</option>
+                       <option value="2">2</option>
+                       <option value="3">3</option>
+                       <option value="4">4</option>
+                    </select>
+                </div>
+
+                <div class="dash">-</div>
+
+                <div class="symbol-block group group-2">
+                    <select name="model" class="symbol-select">
+                        <option>11</option>
+                        <option>23</option>
+                    </select>
+                </div>
+
+                <div class="symbol-block group group-2">
+                    <select name="color" class="symbol-select">
+                        <option>45</option>
+                        <option>99</option>
+                    </select>
+                </div>
+
+                <div class="symbol-block group group-3">
+                    <select name="weight" class="symbol-select">
+                        <option>123</option>
+                        <option>345</option>
+                    </select>
+                </div>
+
+                <div class="dash">-</div>
+
+                <div class="symbol-block group group-2">
+                    <select name="blocks" class="symbol-select">
+                        <option>01</option>
+                        <option>02</option>
+                    </select>
+                </div>
+
+                <div class="symbol-block group group-2">
+                    <select name="details" class="symbol-select">
+                        <option>02</option>
+                        <option>03</option>
+                    </select>
+                </div>
+
+                <div class="dash">-</div>
+
+                <div class="symbol-block single">
+                    <select name="prefix" class="symbol-select">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit" class="start-button">СГЕНЕРИРОВАТЬ</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function handleViewChange(selectElement) {
+            if (selectElement.value === "add_new") {
+                window.location.href = "{{ url_for('main.add_view') }}";
+            }
+        }
+    </script>
+</body>
+</html>

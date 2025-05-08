@@ -1,0 +1,174 @@
+/* Сброс отступов и границ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Общий стиль страницы */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+/* Контейнер генератора */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 1300px;
+    padding: 20px;
+    margin-top: 10vh;
+}
+
+/* Блоки с кодами */
+.code-container {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    background-color: #b3cde0;
+    border-radius: 10px;
+    padding: 20px;
+    gap: 8px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Одиночный символ (A, 1, префикс и т.п.) */
+.symbol-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 6px;
+    border: 2px solid #4a6b81;
+    background-color: #86b0c9;
+    font-weight: bold;
+    font-size: 36px;
+    color: white;
+}
+
+/* Блок для 2 символов */
+.group-2 {
+    min-width: 120px;
+}
+
+/* Блок для 3 символов */
+.group-3 {
+    min-width: 180px;
+}
+
+/* Равномерное распределение символов в двойных блоках */
+.group-2 select.symbol-select {
+    letter-spacing: 20px;
+    text-indent: 15px;
+}
+
+/* Равномерное распределение символов в тройных блоках */
+.group-3 select.symbol-select {
+    letter-spacing: 28px;
+    text-indent: 20px;
+}
+
+/* Общие стили для выпадающего списка */
+.symbol-block select.symbol-select {
+    width: 100%;
+    height: 100%;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    text-align-last: center;
+    color: white;
+    background-color: transparent;
+    border: none;
+    appearance: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Стилизация фокуса (при клике) */
+.symbol-select:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Центрирование текста внутри <option> */
+.symbol-select option {
+    text-align: center;
+}
+
+/* Дефисы между группами */
+.dash {
+    font-size: 50px;
+    font-weight: bold;
+    color: #4a6b81;
+    margin: 0 5px;
+}
+
+/* Кнопка генерации */
+.start-button {
+    background-color: #4a6b81;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.start-button:hover {
+    background-color: #385464;
+    transform: translateY(-2px);
+}
+
+.button-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+/* Адаптация для планшетов и телефонов */
+@media (max-width: 1300px) {
+    .code-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .symbol-block {
+        font-size: 30px;
+        height: 50px;
+    }
+
+    .group-2 {
+        min-width: 100px;
+    }
+
+    .group-3 {
+        min-width: 150px;
+    }
+
+    .dash {
+        font-size: 36px;
+    }
+
+    .start-button {
+        font-size: 20px;
+        padding: 12px 30px;
+    }
+}
