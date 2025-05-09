@@ -220,3 +220,92 @@ body {
     border: 1px solid #ccc;
     resize: vertical;
 }
+
+.description-block {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.description-block label {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.description-block textarea {
+    width: 92%;
+    max-width: 880px;
+    min-height: 100px;
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 2px solid #7dbbd3;
+    resize: vertical;
+    background-color: #f7fafd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: border-color 0.2s ease;
+}
+
+.description-block textarea:focus {
+    border-color: #519ec1;
+    outline: none;
+}
+
+.styled-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    border: 2px solid #b0d4ec;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 2px solid #b0d4ec;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.large-input {
+    height: 50px;
+}
+
+.large-textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.start-button {
+    background-color: #356d91;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.start-button:hover {
+    background-color: #2a5974;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #e3f2fd;
+    border: 2px solid #b0d4ec;
+    border-radius: 5px;
+    color: #356d91;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-button:hover {
+    background-color: #d0ebff;
+}

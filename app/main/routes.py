@@ -19,11 +19,16 @@ def add_view():
             flash('Такой вид уже существует!', 'warning')
             return redirect(url_for('main.index'))
 
-        new_view = View(name=form.name.data)
+        # Сохраняем и название, и описание
+        new_view = View(
+            name=form.name.data,
+            description=form.description.data  # <--- сохраняем описание
+        )
         db.session.add(new_view)
         db.session.commit()
         flash('Вид успешно добавлен!', 'success')
         return redirect(url_for('main.index'))
+
     return render_template('add_view.html', form=form)
 
 @main.route('/')
