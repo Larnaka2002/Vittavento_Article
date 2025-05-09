@@ -87,9 +87,18 @@
                     </select>
                 </div>
             </div>
+             <!-- Блок с описанием артикула -->
+            <div class="form-group">
+                <label for="article_description">Описание артикула</label>
+                <textarea id="article_description" name="article_description" rows="3" placeholder="Введите описание..."></textarea>
+            </div>
+            <!-- Кнопки генерации и перехода -->
             <div class="button-container">
                 <button type="submit" class="start-button">СГЕНЕРИРОВАТЬ</button>
+                <a href="{{ url_for('main.list_articles') }}" class="start-button">Список артикулов</a>
             </div>
+            <input type="hidden" name="article_code" id="article_code">
+
         </form>
     </div>
     <script>
@@ -98,6 +107,25 @@
                 window.location.href = "{{ url_for('main.add_view') }}";
             }
         }
+    </script>
+    <script>
+      document.querySelector('form').addEventListener('submit', function(e) {
+        const symbols = [...document.querySelectorAll('.symbol-select')];
+        const rawCode = symbols.map(el => el.value).join('');
+        const articleCode = [
+            rawCode.slice(0, 4),     // первые 4 символа
+            rawCode.slice(4, 11),    // с 5 по 11 символ
+            rawCode.slice(11, 15),   // с 12 по 15
+            rawCode.slice(15)        // всё, что после 15
+        ].join('-');
+        const descriptionField = document.getElementById('article_description');
+
+
+        document.getElementById('article_code').value = articleCode;
+        document.getElementById('article_description').value = description;
+
+        descriptionField.value = '';
+      });
     </script>
 </body>
 </html>

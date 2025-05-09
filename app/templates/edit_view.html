@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать вид</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Редактировать вид</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Название вида</label>
+                <input type="text" id="name" name="name" value="{{ view.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Описание</label>
+                <textarea id="description" name="description" rows="4">{{ view.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="logo">Логотип / изображение (в разработке)</label>
+                <input type="file" id="logo" name="logo" disabled>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="start-button">Сохранить изменения</button>
+                <a href="{{ url_for('main.index') }}" class="link-back">← Назад</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

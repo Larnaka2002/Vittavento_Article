@@ -2,6 +2,9 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from app import db
 from app.models import View
 from app.forms import ViewForm
+from flask import render_template, redirect, url_for, flash, request
+from flask import request, redirect, url_for, flash, render_template
+from app.models import Article
 
 main = Blueprint('main', __name__)  # создаём blueprint с именем 'main'
 
@@ -27,6 +30,47 @@ def index():
     views = View.query.order_by(View.name).all()
     return render_template('index.html', views=views)
 
-@main.route('/generator')
+@main.route('/edit_view/<int:view_id>', methods=['GET', 'POST'])
+def edit_view(view_id):
+    view = View.query.get_or_404(view_id)
+
+    if request.method == 'POST':
+        new_name = request.form.get('name')
+        new_description = request.form.get('description')
+
+        view.name = new_name
+        view.description = new_description
+
+        db.session.commit()
+        flash('Вид успешно обновлён', 'success')
+        return redirect(url_for('main.index'))
+
+    return render_template('edit_view.html', view=view)
+
+@main.route('/generator', methods=['POST'])
 def generator():
-    return render_template('generator.html')
+    article_code = request.form.get('article_code')
+    description = request.form.get('article_description')
+
+    # Проверка: есть ли уже такой артикул
+    existing = Article.query.filter_by(code=article_code).first()
+    if existing:
+        flash('Такой артикул уже существует!', 'warning')
+    else:
+        new_article = Article(code=article_code, description=description)
+        db.session.add(new_article)
+        db.session.commit()
+        flash('Артикул успешно создан.', 'success')
+
+    return redirect(url_for('main.list_articles'))
+
+@main.route('/articles')
+def list_articles():
+    # Импортируй модель Article, если ещё не подключена
+    from app.models import Article
+
+    # Получаем все артикулы
+    articles = Article.query.order_by(Article.id.desc()).all()
+
+    return render_template('list_articles.html', articles=articles)
+
