@@ -5,6 +5,7 @@ from app.forms import ViewForm
 from flask import render_template, redirect, url_for, flash, request
 from flask import request, redirect, url_for, flash, render_template
 from app.models import Article
+from flask import request, jsonify
 
 main = Blueprint('main', __name__)  # создаём blueprint с именем 'main'
 
@@ -73,4 +74,20 @@ def list_articles():
     articles = Article.query.order_by(Article.id.desc()).all()
 
     return render_template('list_articles.html', articles=articles)
+
+@main.route('/get_prefix', methods=['POST'])
+def get_prefix():
+    from app.models import Article
+
+    partial_code = request.json.get('partial_code')
+    if not partial_code:
+        return jsonify({'error': 'Missing partial_code'}), 400
+
+    # Находим все совпадающие артикулы
+    matches = Article.query.filter(Article.code.like(f"{partial_code}%")).all()
+    existing_prefixes = [int(a.code.split('-')[-1]) for a in matches]
+
+    next_prefix = max(existing_prefixes, default=0) + 1
+
+    return jsonify({'prefix': next_prefix})
 

@@ -79,13 +79,8 @@
 
                 <div class="dash">-</div>
 
-                <div class="symbol-block single">
-                    <select name="prefix" class="symbol-select">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
-                </div>
+
+
             </div>
              <!-- Блок с описанием артикула -->
             <div class="form-group">
@@ -98,6 +93,7 @@
                 <a href="{{ url_for('main.list_articles') }}" class="start-button">Список артикулов</a>
             </div>
             <input type="hidden" name="article_code" id="article_code">
+            <input type="hidden" name="prefix" id="prefix">
 
         </form>
     </div>
@@ -109,23 +105,54 @@
         }
     </script>
     <script>
-      document.querySelector('form').addEventListener('submit', function(e) {
+    document.querySelector('form').addEventListener('submit', async function (e) {
+        e.preventDefault();  // <== вот это обязательно
+
         const symbols = [...document.querySelectorAll('.symbol-select')];
         const rawCode = symbols.map(el => el.value).join('');
-        const articleCode = [
-            rawCode.slice(0, 4),     // первые 4 символа
-            rawCode.slice(4, 11),    // с 5 по 11 символ
-            rawCode.slice(11, 15),   // с 12 по 15
-            rawCode.slice(15)        // всё, что после 15
-        ].join('-');
+
+        const articleCodeParts = [
+            rawCode.slice(0, 4),   // первые 4 символа
+            rawCode.slice(4, 11),  // с 5 по 11
+            rawCode.slice(11, 15), // с 12 по 15
+            rawCode.slice(15)      // после 15
+        ];
+
+        const partialCode = articleCodeParts.slice(0, 3).join('-'); // Без префикса
+        let nextPrefix = 1;
+
+        try {
+            const response = await fetch('/get_prefix', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ partial_code: partialCode })
+            });
+
+            const data = await response.json();
+            nextPrefix = data.prefix || 1;
+        } catch (error) {
+            console.error('Ошибка при получении префикса:', error);
+        }
+
+        articleCodeParts.push(nextPrefix); // Добавляем префикс
+        const fullCode = articleCodeParts.join('-');
+
         const descriptionField = document.getElementById('article_description');
+        const description = descriptionField.value || 'Сгенерированный артикул';
 
-
-        document.getElementById('article_code').value = articleCode;
+        document.getElementById('article_code').value = fullCode;
+        document.getElementById('prefix').value = nextPrefix;
         document.getElementById('article_description').value = description;
 
-        descriptionField.value = '';
-      });
+        // Отладка (временно)
+        console.log('Отправка:', fullCode, description);
+
+        // Завершаем — отправляем форму вручную
+        e.target.submit();
+    });
     </script>
 </body>
 </html>
+
