@@ -16,16 +16,25 @@ main = Blueprint('main', __name__)
 def add_view():
     form = ViewForm()
     if form.validate_on_submit():
+        # Проверка: существует ли уже такой Вид
         existing_view = View.query.filter_by(name=form.name.data).first()
         if existing_view:
             flash('Такой вид уже существует!', 'warning')
             return redirect(url_for('main.index'))
-        new_view = View(name=form.name.data)
+
+        # Если нет — создаём новый Вид с названием и описанием
+        new_view = View(
+            name=form.name.data,
+            description=form.description.data
+        )
         db.session.add(new_view)
         db.session.commit()
         flash('Вид успешно добавлен!', 'success')
         return redirect(url_for('main.index'))
+
+    # Отобразить форму добавления Вида
     return render_template('add_view.html', form=form)
+
 
 # 🔹 Главная страница - список всех Видов изделий
 @main.route('/')
@@ -37,15 +46,24 @@ def index():
 @main.route('/edit_view/<int:view_id>', methods=['GET', 'POST'])
 def edit_view(view_id):
     view = View.query.get_or_404(view_id)
+
     if request.method == 'POST':
+        # Получаем новые данные из формы
         new_name = request.form.get('name')
         new_description = request.form.get('description')
+
+        # Обновляем поля Вида
         view.name = new_name
         view.description = new_description
+
+        # Сохраняем изменения
         db.session.commit()
-        flash('Вид успешно обновлён', 'success')
+        flash('Вид успешно обновлён!', 'success')
         return redirect(url_for('main.index'))
+
+    # Отобразить форму редактирования
     return render_template('edit_view.html', view=view)
+
 
 # --- Маршруты работы с Артикулами ---
 
@@ -96,21 +114,66 @@ def view_article(article_id):
     Страница просмотра одного артикула по его ID
     """
     article = Article.query.get_or_404(article_id)
-    return render_template('view_article.html', article=article)
+
+    # Попытка найти вид изделия по первой букве кода артикула
+    view = None
+    if article.code:
+        first_letter = article.code[0]
+        view = View.query.filter(View.name.startswith(first_letter)).first()
+
+    return render_template('view_article.html', article=article, view=view)
+
 
 # 🔹 Маршрут для редактирования артикула
 @main.route('/edit_article/<int:article_id>', methods=['GET', 'POST'])
 def edit_article(article_id):
     """
-    Страница редактирования артикула по его ID
+    Страница редактирования артикула и его связанного Вида
     """
     article = Article.query.get_or_404(article_id)
     form = EditArticleForm(obj=article)
 
+    # Попытка найти вид изделия по первой букве кода артикула
+    view = None
+    if article.code:
+        first_letter = article.code[0]
+        view = View.query.filter(View.name.startswith(first_letter)).first()
+
     if form.validate_on_submit():
-        article.description = form.description.data  # Обновляем описание
+        # Обновляем описание артикула
+        article.description = form.description.data
+
+        # Если пользователь передал новые данные для Вида изделия
+        if view:
+            view.name = request.form.get('view_name') or view.name
+            view.description = request.form.get('view_description') or view.description
+
         db.session.commit()
-        flash('Артикул успешно обновлён!', 'success')
+        flash('Артикул и вид изделия успешно обновлены!', 'success')
         return redirect(url_for('main.view_article', article_id=article.id))
 
-    return render_template('edit_article.html', form=form, article=article)
+    return render_template('edit_article.html', form=form, article=article, view=view)
+
+# 🔹 Маршрут для удаления Вида изделия
+@main.route('/delete_view/<int:view_id>', methods=['POST'])
+def delete_view(view_id):
+    view = View.query.get_or_404(view_id)
+
+    # Проверка: есть ли артикулы, связанные с этим видом
+    linked_articles = Article.query.filter(Article.code.startswith(view.name)).all()
+
+    if linked_articles:
+        flash('Невозможно удалить: существуют артикулы, связанные с этим видом.', 'danger')
+        return redirect(url_for('main.index'))
+
+    db.session.delete(view)
+    db.session.commit()
+    flash('Вид успешно удалён!', 'success')
+    return redirect(url_for('main.index'))
+
+# 🔹 Маршрут для отображения всех Видов изделий
+@main.route('/views')
+def list_views():
+    views = View.query.order_by(View.name).all()
+    return render_template('list_views.html', views=views)
+

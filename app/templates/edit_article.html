@@ -7,33 +7,57 @@
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <!-- Заголовок страницы -->
-        <h1>Редактировать артикул</h1>
+    <h1>Редактировать артикул</h1>
 
-        <!-- Форма редактирования артикула -->
-        <form method="POST">
-            {{ form.hidden_tag() }}
+    <!-- Форма редактирования артикула -->
+    <form method="POST">
+        {{ form.hidden_tag() }}
 
-            <!-- Поле для редактирования описания -->
-            <div class="form-group">
-                {{ form.description.label }}<br>
-                {{ form.description(rows=4, cols=50) }}
-            </div>
-
-            <!-- Кнопка сохранения изменений -->
-            <div class="button-container">
-                {{ form.submit(class_="start-button") }}
-            </div>
-        </form>
-
-        <!-- Кнопка возврата назад -->
-        <div class="button-container">
-            <a href="{{ url_for('main.list_articles') }}" class="back-button">← Назад к списку</a>
+        <!-- Поле Описание артикула -->
+        <div class="form-group">
+            <label for="description">{{ form.description.label }}</label><br>
+            {{ form.description(rows=4, cols=50) }}
         </div>
 
-    </div>
+        <!-- Если найден Вид изделия -->
+        {% if view %}
+        <div class="description-block" style="border: 2px solid #4a6b81; padding: 15px; border-radius: 10px; margin-top: 20px;">
+            <h2>Редактировать Вид изделия</h2>
+
+            <!-- Название вида -->
+            <div class="form-group">
+                <label for="view_name">Название вида</label><br>
+                <input type="text" id="view_name" name="view_name" value="{{ view.name }}" required>
+            </div>
+
+            <!-- Описание вида -->
+            <div class="form-group">
+                <label for="view_description">Описание вида</label><br>
+                <textarea id="view_description" name="view_description" rows="4" cols="50">{{ view.description }}</textarea>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if view %}
+        <div class="button-container" style="margin-top: 20px;">
+            <a href="{{ url_for('main.edit_view', view_id=view.id) }}" class="start-button">
+                ✏️ Перейти к редактированию Вида изделия
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Кнопка сохранить -->
+        <div class="button-container">
+            {{ form.submit(class_="start-button") }}
+        </div>
+    </form>
+
+    <!-- Кнопка назад -->
+    <p><a href="{{ url_for('main.list_articles') }}" class="back-button">← Назад к списку артикулов</a></p>
+
+</div>
 
 </body>
 </html>

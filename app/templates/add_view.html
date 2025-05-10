@@ -3,39 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Добавить новый вид</title>
-    <!-- Подключение основного файла стилей -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <!-- Заголовок страницы -->
-        <h1>Добавить новый вид</h1>
+    <h1>Добавить новый вид изделия</h1>
 
-        <!-- Форма добавления нового вида -->
-        <form method="POST">
-            <!-- CSRF токен и скрытые поля формы -->
-            {{ form.hidden_tag() }}
+    <form method="POST">
+        {{ form.hidden_tag() }}
 
-            <!-- Поле для ввода названия вида изделия -->
-            <div>
-                {{ form.name.label }}<br>
-                {{ form.name(size=32) }}
-            </div>
+        <!-- Поле Название вида -->
+        <div class="form-group">
+            <label for="name">{{ form.name.label }}</label><br>
+            {{ form.name(id="name", size=32) }}
+        </div>
 
-            <!-- Кнопка отправки формы -->
-            <div>
-                {{ form.submit(class_="start-button") }}
-            </div>
-        </form>
+        <!-- Поле Описание вида -->
+        <div class="form-group">
+            <label for="description">{{ form.description.label }}</label><br>
+            {{ form.description(id="description", rows=4, cols=50) }}
+        </div>
 
-        <!-- Ссылка для возврата назад на главную страницу -->
-        <p>
-            <a href="{{ url_for('main.index') }}">← Назад</a>
-        </p>
+        <!-- Кнопка отправки формы -->
+        <div class="button-container">
+            {{ form.submit(class_="start-button") }}
+        </div>
+    </form>
 
-    </div>
+    <!-- Ссылка назад -->
+    <p><a href="{{ url_for('main.index') }}" class="back-button">← Назад</a></p>
+
+</div>
 
 </body>
 </html>

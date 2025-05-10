@@ -129,10 +129,12 @@ body {
 
 /* Контейнер для кнопок генерации */
 .button-container {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
 }
 
 /* Таблица артикулов */

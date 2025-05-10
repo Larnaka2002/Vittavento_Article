@@ -7,36 +7,46 @@
 </head>
 <body>
 
-        <!-- Блок для Flash-сообщений -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash-message {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<div class="container">
 
+    <!-- Заголовок страницы -->
+    <h1>Редактировать вид изделия</h1>
 
-    <div class="container">
-        <h1>Редактировать вид</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="name">Название вида</label>
-                <input type="text" id="name" name="name" value="{{ view.name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Описание</label>
-                <textarea id="description" name="description" rows="4">{{ view.description }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="logo">Логотип / изображение (в разработке)</label>
-                <input type="file" id="logo" name="logo" disabled>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="start-button">Сохранить изменения</button>
-                <a href="{{ url_for('main.index') }}" class="link-back">← Назад</a>
-            </div>
+    <!-- Форма редактирования -->
+    <form method="POST">
+
+        <!-- Поле Название вида -->
+        <div class="form-group">
+            <label for="name">Название вида</label><br>
+            <input type="text" id="name" name="name" value="{{ view.name }}" required>
+        </div>
+
+        <!-- Поле Описание вида -->
+        <div class="form-group">
+            <label for="description">Описание вида</label><br>
+            <textarea id="description" name="description" rows="4" cols="50">{{ view.description }}</textarea>
+        </div>
+
+        <!-- Кнопка отправки формы -->
+        <div class="button-container">
+            <button type="submit" class="start-button">Сохранить изменения</button>
+        </div>
+    </form>
+
+    <!-- Кнопка удаления Вида изделия -->
+    <div class="button-container" style="margin-top: 20px;">
+        <form method="POST" action="{{ url_for('main.delete_view', view_id=view.id) }}" style="display: inline;">
+            <button type="submit" class="start-button" onclick="return confirm('Вы уверены, что хотите удалить этот вид?')">
+                ❌ Удалить Вид
+            </button>
         </form>
     </div>
+
+
+    <!-- Ссылка назад -->
+    <p><a href="{{ url_for('main.index') }}" class="back-button">← Назад</a></p>
+
+</div>
+
 </body>
 </html>

@@ -7,24 +7,38 @@
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <!-- Заголовок страницы -->
-        <h1>Просмотр артикула</h1>
+    <!-- Заголовок страницы -->
+    <h1>Просмотр артикула</h1>
 
-        <!-- Отображение данных артикула -->
-        <div class="description-block">
-            <p><strong>Код артикула:</strong> {{ article.code }}</p>
-            <p><strong>Описание:</strong> {{ article.description or 'Описание отсутствует' }}</p>
-        </div>
-
-        <!-- Кнопки действий -->
-        <div class="button-container">
-            <a href="{{ url_for('main.edit_article', article_id=article.id) }}" class="start-button">✏️ Изменить</a>
-            <a href="{{ url_for('main.list_articles') }}" class="back-button">← Назад к списку</a>
-        </div>
-
+    <!-- Информация об артикулах -->
+    <div class="description-block">
+        <p><strong>Код артикула:</strong> {{ article.code }}</p>
+        <p><strong>Описание артикула:</strong> {{ article.description or 'Описание отсутствует' }}</p>
     </div>
+
+    <!-- Информация о Виде изделия -->
+    {% if view %}
+    <div class="description-block">
+        <h2>Информация о Виде изделия</h2>
+        <p><strong>Название вида:</strong> {{ view.name }}</p>
+        <p><strong>Описание вида:</strong> {{ view.description or 'Описание отсутствует' }}</p>
+    </div>
+    {% else %}
+    <div class="description-block">
+        <h2>Информация о Виде изделия</h2>
+        <p>Не удалось определить вид изделия по коду артикула.</p>
+    </div>
+    {% endif %}
+
+    <!-- Кнопки действий -->
+    <div class="button-container">
+        <a href="{{ url_for('main.edit_article', article_id=article.id) }}" class="start-button">✏️ Изменить артикул</a>
+        <a href="{{ url_for('main.list_articles') }}" class="back-button">← Назад к списку</a>
+    </div>
+
+</div>
 
 </body>
 </html>

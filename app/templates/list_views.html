@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список Видов изделий</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Список Видов изделий</h1>
+
+    <table class="article-table">
+        <thead>
+            <tr>
+                <th>Название вида</th>
+                <th>Описание</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for view in views %}
+            <tr>
+                <td>{{ view.name }}</td>
+                <td>{{ view.description or 'Описание отсутствует' }}</td>
+                <td class="action-buttons">
+                    <a href="{{ url_for('main.edit_view', view_id=view.id) }}">Редактировать</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><a href="{{ url_for('main.index') }}" class="back-button">← Назад</a></p>
+
+</div>
+
+</body>
+</html>
