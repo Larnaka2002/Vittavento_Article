@@ -43,7 +43,7 @@
           <td>{{ article.description }}</td> <!-- Описание артикула -->
           <td class="action-buttons">
             <!-- Ссылки на действия: Просмотр, QR-код, Штрихкод, PDF -->
-            <a href="#">Просмотр</a>
+            <a href="{{ url_for('main.view_article', article_id=article.id) }}">Просмотр</a>
             <a href="#">QR</a>
             <a href="#">Штрихкод</a>
             <a href="#">PDF</a>

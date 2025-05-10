@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать артикул</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Заголовок страницы -->
+        <h1>Редактировать артикул</h1>
+
+        <!-- Форма редактирования артикула -->
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <!-- Поле для редактирования описания -->
+            <div class="form-group">
+                {{ form.description.label }}<br>
+                {{ form.description(rows=4, cols=50) }}
+            </div>
+
+            <!-- Кнопка сохранения изменений -->
+            <div class="button-container">
+                {{ form.submit(class_="start-button") }}
+            </div>
+        </form>
+
+        <!-- Кнопка возврата назад -->
+        <div class="button-container">
+            <a href="{{ url_for('main.list_articles') }}" class="back-button">← Назад к списку</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

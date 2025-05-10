@@ -4,18 +4,23 @@
 from flask_wtf import FlaskForm
 
 # 🔹 Импорт полей формы
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, TextAreaField
 
 # 🔹 Импорт валидаторов
 from wtforms.validators import DataRequired
 
 # 🔹 Форма для добавления нового Вида изделия
 class ViewForm(FlaskForm):
-    # Поле ввода названия вида изделия
     name = StringField(
         label='Название вида',
         validators=[DataRequired(message="Поле обязательно для заполнения")]
     )
-
-    # Кнопка для отправки формы
     submit = SubmitField('Добавить')
+
+# 🔹 Форма для редактирования Артикула
+class EditArticleForm(FlaskForm):
+    description = TextAreaField(
+        label='Описание артикула',
+        validators=[DataRequired(message="Поле обязательно для заполнения")]
+    )
+    submit = SubmitField('Сохранить изменения')
