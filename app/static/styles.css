@@ -1,11 +1,11 @@
-/* Сброс отступов и границ */
+/* Сброс отступов и границ для всех элементов */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Общий стиль страницы */
+/* Основной стиль страницы */
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f7fa;
@@ -15,7 +15,7 @@ body {
     min-height: 100vh;
 }
 
-/* Контейнер генератора */
+/* Главный контейнер для контента */
 .container {
     display: flex;
     flex-direction: column;
@@ -27,7 +27,7 @@ body {
     margin-top: 10vh;
 }
 
-/* Блоки с кодами */
+/* Блок с символами генератора артикулов */
 .code-container {
     display: flex;
     flex-wrap: nowrap;
@@ -41,7 +41,7 @@ body {
     overflow-x: auto;
 }
 
-/* Одиночный символ (A, 1, префикс и т.п.) */
+/* Стиль одного блока символа */
 .symbol-block {
     display: flex;
     justify-content: center;
@@ -56,29 +56,22 @@ body {
     color: white;
 }
 
-/* Блок для 2 символов */
-.group-2 {
-    min-width: 120px;
-}
+/* Символьные группы */
+.group-2 { min-width: 120px; }
+.group-3 { min-width: 180px; }
 
-/* Блок для 3 символов */
-.group-3 {
-    min-width: 180px;
-}
-
-/* Равномерное распределение символов в двойных блоках */
+/* Выравнивание символов в select-блоках */
 .group-2 select.symbol-select {
     letter-spacing: 20px;
     text-indent: 15px;
 }
 
-/* Равномерное распределение символов в тройных блоках */
 .group-3 select.symbol-select {
     letter-spacing: 28px;
     text-indent: 20px;
 }
 
-/* Общие стили для выпадающего списка */
+/* Общие стили для всех select внутри блока символов */
 .symbol-block select.symbol-select {
     width: 100%;
     height: 100%;
@@ -95,18 +88,18 @@ body {
     cursor: pointer;
 }
 
-/* Стилизация фокуса (при клике) */
+/* Эффект при фокусе на select */
 .symbol-select:focus {
     outline: none;
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Центрирование текста внутри <option> */
+/* Центрирование текста в выпадающих списках */
 .symbol-select option {
     text-align: center;
 }
 
-/* Дефисы между группами */
+/* Стиль дефиса между группами */
 .dash {
     font-size: 50px;
     font-weight: bold;
@@ -114,7 +107,7 @@ body {
     margin: 0 5px;
 }
 
-/* Кнопка генерации */
+/* Стиль кнопки генерации артикула */
 .start-button {
     background-color: #4a6b81;
     color: white;
@@ -124,7 +117,7 @@ body {
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
     text-decoration: none;
     text-align: center;
 }
@@ -134,6 +127,7 @@ body {
     transform: translateY(-2px);
 }
 
+/* Контейнер для кнопок генерации */
 .button-container {
     position: fixed;
     bottom: 30px;
@@ -141,7 +135,81 @@ body {
     z-index: 1000;
 }
 
-/* Адаптация для планшетов и телефонов */
+/* Таблица артикулов */
+.article-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+/* Ячейки таблицы */
+.article-table th,
+.article-table td {
+    border: 1px solid #4a6b81;
+    padding: 12px 16px;
+    text-align: left;
+}
+
+/* Заголовки таблицы */
+.article-table th {
+    background-color: #4a6b81;
+    color: white;
+}
+
+/* Чередование фона строк */
+.article-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Кнопки действий в таблице */
+.action-buttons a {
+    margin-right: 10px;
+    color: #4a6b81;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.action-buttons a:hover {
+    text-decoration: underline;
+}
+
+/* Описание артикула */
+.description-block {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.description-block textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+/* Новое! Кнопка \"Назад к генератору\" */
+.back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    background-color: #4a6b81;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.back-button:hover {
+    background-color: #385464;
+    transform: translateY(-2px);
+}
+
+/* Адаптивность: планшеты и телефоны */
 @media (max-width: 1300px) {
     .code-container {
         flex-wrap: wrap;
@@ -171,52 +239,48 @@ body {
         font-size: 20px;
         padding: 12px 30px;
     }
+
+    .back-button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
 }
 
-.article-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 30px;
-}
-
-.article-table th,
-.article-table td {
-  border: 1px solid #4a6b81;
-  padding: 12px 16px;
-  text-align: left;
-}
-
-.article-table th {
-  background-color: #4a6b81;
-  color: white;
-}
-
-.article-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.action-buttons a {
-  margin-right: 10px;
-  color: #4a6b81;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.action-buttons a:hover {
-  text-decoration: underline;
-}
-
-.description-block {
-    margin-top: 20px;
-    width: 100%;
-    max-width: 900px;
-}
-
-.description-block textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
+/* --- Стили для Flash-сообщений --- */
+.flash-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4caf50; /* Зеленый фон для успешных сообщений */
+    color: white;
+    padding: 15px 25px;
     border-radius: 8px;
-    border: 1px solid #ccc;
-    resize: vertical;
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    animation: fadeInOut 4s forwards;
+}
+
+/* Красный фон для сообщений об ошибке */
+.flash-message.error {
+    background-color: #f44336;
+}
+
+/* Анимация появления и исчезновения сообщения */
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
 }

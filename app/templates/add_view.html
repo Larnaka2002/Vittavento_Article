@@ -3,17 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Добавить новый вид</title>
+    <!-- Подключение основного файла стилей -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+
     <div class="container">
+
+        <!-- Заголовок страницы -->
         <h1>Добавить новый вид</h1>
+
+        <!-- Форма добавления нового вида -->
         <form method="POST">
+            <!-- CSRF токен и скрытые поля формы -->
             {{ form.hidden_tag() }}
-            <div>{{ form.name.label }}<br>{{ form.name(size=32) }}</div>
-            <div>{{ form.submit(class_="start-button") }}</div>
+
+            <!-- Поле для ввода названия вида изделия -->
+            <div>
+                {{ form.name.label }}<br>
+                {{ form.name(size=32) }}
+            </div>
+
+            <!-- Кнопка отправки формы -->
+            <div>
+                {{ form.submit(class_="start-button") }}
+            </div>
         </form>
-        <p><a href="{{ url_for('main.index') }}">← Назад</a></p>
+
+        <!-- Ссылка для возврата назад на главную страницу -->
+        <p>
+            <a href="{{ url_for('main.index') }}">← Назад</a>
+        </p>
+
     </div>
+
 </body>
 </html>

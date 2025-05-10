@@ -3,15 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Vittavento Article Generator</title>
+    <!-- Подключение CSS файла -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+
+    <!-- Блок для Flash-сообщений -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+
     <div class="container">
         <h1>Vittavento Article Generator</h1>
 
+        <!-- Форма генерации артикула -->
         <form method="POST" action="{{ url_for('main.generator') }}">
             <div class="code-container">
 
+                <!-- Выпадающий список выбора вида изделия -->
                 <div class="symbol-block group group-1">
                   <select class="symbol-select" name="view" onchange="if (this.value === 'add_new') window.location.href='/add_view'">
                     {% for v in views %}
@@ -21,6 +35,7 @@
                   </select>
                 </div>
 
+                <!-- Категория изделия -->
                 <div class="symbol-block group group-2">
                     <select name="category" class="symbol-select">
                         <option>BC</option>
@@ -29,6 +44,7 @@
                     </select>
                 </div>
 
+                <!-- Уровень изделия -->
                 <div class="symbol-block single">
                     <select name="level" class="symbol-select">
                        <option value="1">1</option>
@@ -40,6 +56,7 @@
 
                 <div class="dash">-</div>
 
+                <!-- Модель изделия -->
                 <div class="symbol-block group group-2">
                     <select name="model" class="symbol-select">
                         <option>11</option>
@@ -47,6 +64,7 @@
                     </select>
                 </div>
 
+                <!-- Цвет изделия -->
                 <div class="symbol-block group group-2">
                     <select name="color" class="symbol-select">
                         <option>45</option>
@@ -54,6 +72,7 @@
                     </select>
                 </div>
 
+                <!-- Вес изделия -->
                 <div class="symbol-block group group-3">
                     <select name="weight" class="symbol-select">
                         <option>123</option>
@@ -63,6 +82,7 @@
 
                 <div class="dash">-</div>
 
+                <!-- Блок изделия -->
                 <div class="symbol-block group group-2">
                     <select name="blocks" class="symbol-select">
                         <option>01</option>
@@ -70,6 +90,7 @@
                     </select>
                 </div>
 
+                <!-- Детали изделия -->
                 <div class="symbol-block group group-2">
                     <select name="details" class="symbol-select">
                         <option>02</option>
@@ -79,24 +100,28 @@
 
                 <div class="dash">-</div>
 
-
-
             </div>
-             <!-- Блок с описанием артикула -->
+
+            <!-- Блок с описанием артикула -->
             <div class="form-group">
                 <label for="article_description">Описание артикула</label>
                 <textarea id="article_description" name="article_description" rows="3" placeholder="Введите описание..."></textarea>
             </div>
-            <!-- Кнопки генерации и перехода -->
+
+            <!-- Кнопки для генерации и перехода к списку артикулов -->
             <div class="button-container">
                 <button type="submit" class="start-button">СГЕНЕРИРОВАТЬ</button>
                 <a href="{{ url_for('main.list_articles') }}" class="start-button">Список артикулов</a>
             </div>
+
+            <!-- Скрытые поля для передачи данных -->
             <input type="hidden" name="article_code" id="article_code">
             <input type="hidden" name="prefix" id="prefix">
 
         </form>
     </div>
+
+    <!-- Функция для перенаправления при выборе добавления нового вида -->
     <script>
         function handleViewChange(selectElement) {
             if (selectElement.value === "add_new") {
@@ -104,23 +129,29 @@
             }
         }
     </script>
+
+    <!-- Основной скрипт генерации артикула -->
     <script>
     document.querySelector('form').addEventListener('submit', async function (e) {
-        e.preventDefault();  // <== вот это обязательно
+        e.preventDefault();  // Останавливаем стандартную отправку формы
 
+        // Собираем все выбранные значения из выпадающих списков
         const symbols = [...document.querySelectorAll('.symbol-select')];
         const rawCode = symbols.map(el => el.value).join('');
 
+        // Разбиваем код на логические части
         const articleCodeParts = [
-            rawCode.slice(0, 4),   // первые 4 символа
-            rawCode.slice(4, 11),  // с 5 по 11
-            rawCode.slice(11, 15), // с 12 по 15
-            rawCode.slice(15)      // после 15
+            rawCode.slice(0, 4),   // Вид изделия
+            rawCode.slice(4, 11),  // Категория и уровень
+            rawCode.slice(11, 15), // Модель и цвет
+            rawCode.slice(15)      // Блок и детали
         ];
 
-        const partialCode = articleCodeParts.slice(0, 3).join('-'); // Без префикса
+        // Создаем код артикула без префикса
+        const partialCode = articleCodeParts.slice(0, 3).join('-');
         let nextPrefix = 1;
 
+        // Отправляем запрос на сервер для получения следующего префикса
         try {
             const response = await fetch('/get_prefix', {
                 method: 'POST',
@@ -136,9 +167,11 @@
             console.error('Ошибка при получении префикса:', error);
         }
 
-        articleCodeParts.push(nextPrefix); // Добавляем префикс
+        // Добавляем префикс к полному коду артикула
+        articleCodeParts.push(nextPrefix);
         const fullCode = articleCodeParts.join('-');
 
+        // Заполняем скрытые поля формы перед отправкой
         const descriptionField = document.getElementById('article_description');
         const description = descriptionField.value || 'Сгенерированный артикул';
 
@@ -146,13 +179,12 @@
         document.getElementById('prefix').value = nextPrefix;
         document.getElementById('article_description').value = description;
 
-        // Отладка (временно)
+        // Логирование для отладки
         console.log('Отправка:', fullCode, description);
 
-        // Завершаем — отправляем форму вручную
+        // Отправляем форму
         e.target.submit();
     });
     </script>
 </body>
 </html>
-

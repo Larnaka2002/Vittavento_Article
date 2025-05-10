@@ -3,12 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <title>Список артикулов</title>
+  <!-- Подключение основного файла стилей -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+
+  <!-- Блок для Flash-сообщений -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+
   <div class="container">
+
+    <!-- Кнопка для возврата на генератор артикулов -->
+    <a href="{{ url_for('main.index') }}" class="back-button">← Назад к генератору</a>
+
+    <!-- Заголовок страницы -->
     <h1>Список артикулов</h1>
 
+    <!-- Таблица с данными об артикуле -->
     <table class="article-table">
       <thead>
         <tr>
@@ -18,11 +36,13 @@
         </tr>
       </thead>
       <tbody>
+        <!-- Перебор всех артикулов, полученных из базы данных -->
         {% for article in articles %}
         <tr>
-          <td>{{ article.code }}</td>
-          <td>{{ article.description }}</td>
+          <td>{{ article.code }}</td> <!-- Код артикула -->
+          <td>{{ article.description }}</td> <!-- Описание артикула -->
           <td class="action-buttons">
+            <!-- Ссылки на действия: Просмотр, QR-код, Штрихкод, PDF -->
             <a href="#">Просмотр</a>
             <a href="#">QR</a>
             <a href="#">Штрихкод</a>
@@ -33,7 +53,6 @@
       </tbody>
     </table>
 
-    <a href="{{ url_for('main.index') }}" class="back-link">← Назад к генератору</a>
   </div>
 </body>
 </html>
