@@ -249,40 +249,94 @@ body {
 }
 
 /* --- Стили для Flash-сообщений --- */
+
+/* Базовый стиль для всех сообщений */
 .flash-message {
     position: fixed;
     top: 20px;
-    right: 20px;
-    background-color: #4caf50; /* Зеленый фон для успешных сообщений */
-    color: white;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+
     padding: 15px 25px;
     border-radius: 8px;
     font-size: 16px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 2000;
     animation: fadeInOut 4s forwards;
+    color: white;
 }
 
-/* Красный фон для сообщений об ошибке */
-.flash-message.error {
-    background-color: #f44336;
+/* Стиль для успешного сообщения (зелёный) */
+.flash-message.success {
+    background-color: #4caf50; /* Зелёный фон */
+}
+
+/* Стиль для предупреждения (жёлтый) */
+.flash-message.warning {
+    background-color: #ffc107; /* Жёлтый фон */
+    color: #000; /* Чёрный текст для лучшей читаемости */
+}
+
+/* Стиль для ошибки (красный) */
+.flash-message.danger {
+    background-color: #f44336; /* Красный фон */
 }
 
 /* Анимация появления и исчезновения сообщения */
 @keyframes fadeInOut {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    90% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
 }
+
+
+/* Блок для описания артикула */
+.description-block {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    border: 2px solid #4a6b81;
+    border-radius: 10px;
+    background-color: #b3cde0;
+}
+
+/* Стили для текстового поля внутри блока */
+.description-block textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    background: transparent;
+    color: #333;
+    resize: vertical;
+}
+
+.description-block {
+    border: 2px solid #4a6b81;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    margin-bottom: 20px;
+}
+
+.pretty-input {
+    font-size: 22px; /* Крупный текст */
+    border: 2px solid #4a6b81; /* Красивая синяя рамка */
+    padding: 10px; /* Отступы внутри */
+    border-radius: 8px; /* Скругление углов */
+    width: 100%; /* Растягиваем по ширине */
+    box-sizing: border-box; /* Чтобы padding не увеличивал общую ширину */
+    font-weight: bold; /* Жирный текст */
+}
+
+/* Специальный стиль для одиночной группы символов */
+.group-1 {
+    min-width: 60px;
+    max-width: 60px;
+    height: 60px;
+}
+
