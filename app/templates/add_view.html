@@ -17,19 +17,20 @@
         <!-- Поле Название вида -->
         <div class="form-group">
             <label for="name">{{ form.name.label }}</label><br>
-            {{ form.name(id="name", size=32) }}
+            {{ form.name(id="name", size=32, class_="pretty-input") }}
         </div>
 
         <!-- Поле Описание вида -->
         <div class="form-group">
             <label for="description">{{ form.description.label }}</label><br>
-            {{ form.description(id="description", rows=4, cols=50) }}
+            {{ form.description(id="description", rows=4, cols=50, class_="pretty-input") }}
         </div>
 
         <!-- Кнопка отправки формы -->
         <div class="button-container">
             {{ form.submit(class_="start-button") }}
         </div>
+
     </form>
 
     <!-- Ссылка назад -->

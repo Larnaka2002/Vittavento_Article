@@ -15,11 +15,16 @@
     <form method="POST">
         {{ form.hidden_tag() }}
 
-        <!-- Поле Описание артикула -->
-        <div class="form-group">
-            <label for="description">{{ form.description.label }}</label><br>
-            {{ form.description(rows=4, cols=50) }}
+        <!-- Блок редактирования Описания артикула -->
+        <div class="description-block" style="border: 2px solid #4a6b81; padding: 15px; border-radius: 8px; background-color: #f8f9fa; margin-bottom: 20px;">
+            <h2>Описание артикула</h2>
+
+            <div class="form-group">
+                <label for="description">{{ form.description.label }}</label><br>
+                {{ form.description(rows=1, cols=60) }}
+            </div>
         </div>
+
 
         <!-- Если найден Вид изделия -->
         {% if view %}
@@ -29,24 +34,18 @@
             <!-- Название вида -->
             <div class="form-group">
                 <label for="view_name">Название вида</label><br>
-                <input type="text" id="view_name" name="view_name" value="{{ view.name }}" required>
+                <input type="text" id="view_name" name="view_name" value="{{ view.name }}" required class="pretty-input">
+
             </div>
 
             <!-- Описание вида -->
             <div class="form-group">
                 <label for="view_description">Описание вида</label><br>
-                <textarea id="view_description" name="view_description" rows="4" cols="50">{{ view.description }}</textarea>
+                <textarea id="view_description" name="view_description" rows="1" cols="50">{{ view.description }}</textarea>
             </div>
         </div>
         {% endif %}
 
-        {% if view %}
-        <div class="button-container" style="margin-top: 20px;">
-            <a href="{{ url_for('main.edit_view', view_id=view.id) }}" class="start-button">
-                ✏️ Перейти к редактированию Вида изделия
-            </a>
-        </div>
-        {% endif %}
 
         <!-- Кнопка сохранить -->
         <div class="button-container">

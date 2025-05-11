@@ -42,28 +42,6 @@ def index():
     views = View.query.order_by(View.name).all()
     return render_template('index.html', views=views)
 
-# 🔹 Маршрут для редактирования существующего Вида изделия
-@main.route('/edit_view/<int:view_id>', methods=['GET', 'POST'])
-def edit_view(view_id):
-    view = View.query.get_or_404(view_id)
-
-    if request.method == 'POST':
-        # Получаем новые данные из формы
-        new_name = request.form.get('name')
-        new_description = request.form.get('description')
-
-        # Обновляем поля Вида
-        view.name = new_name
-        view.description = new_description
-
-        # Сохраняем изменения
-        db.session.commit()
-        flash('Вид успешно обновлён!', 'success')
-        return redirect(url_for('main.index'))
-
-    # Отобразить форму редактирования
-    return render_template('edit_view.html', view=view)
-
 
 # --- Маршруты работы с Артикулами ---
 
