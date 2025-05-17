@@ -67,27 +67,27 @@ def add_category():
 
 
 # 🔹 Главная страница - список всех Видов изделий
-@main.route('/', methods=['GET', 'POST'])
+@main.route('/', methods=['GET'])
 def index():
-    from app.forms import FilterForm
-    form = FilterForm()
-
+    """
+    Главная страница генерации артикула.
+    При передаче ?view=ID подгружает соответствующие категории.
+    """
     views = View.query.order_by(View.name).all()
-    selected_view_id = request.form.get("view")
-
+    view_id = request.args.get('view')
     categories = []
-    if selected_view_id and selected_view_id != "add_new":
-        try:
-            selected_view_id_int = int(selected_view_id)
-            categories = Category.query.filter_by(view_id=selected_view_id_int).order_by(Category.name).all()
-        except ValueError:
-            categories = []
+
+    if view_id and view_id.isdigit():
+        view_id_int = int(view_id)
+        categories = Category.query.filter_by(view_id=view_id_int).order_by(Category.name).all()
+    else:
+        view_id = None
 
     return render_template('index.html',
                            views=views,
                            categories=categories,
-                           selected_view_id=selected_view_id,
-                           form=form)
+                           selected_view_id=view_id)
+
 
 
 # --- Маршруты работы с Артикулами ---
@@ -95,23 +95,66 @@ def index():
 # 🔹 Маршрут для генерации нового Артикула
 @main.route('/generator', methods=['POST'])
 def generator():
-    article_code = request.form.get('article_code')
+    # 📥 Получаем данные из формы
+    view_id = request.form.get('view')
+    category_name = request.form.get('category')
+    level = request.form.get('level') or "0"
+    model = request.form.get('model') or "00"
+    color = request.form.get('color') or "00"
+    weight = request.form.get('weight') or "000"
+    blocks = request.form.get('blocks') or "00"
+    details = request.form.get('details') or "00"
+    prefix = request.form.get('prefix') or "0"
     description = request.form.get('article_description')
 
+    # 📦 Загружаем список всех видов
+    views = View.query.order_by(View.name).all()
+    categories = []
+
+    # 🔤 Получаем первую букву названия Вида
+    view_symbol = "X"
+    if view_id and view_id.isdigit():
+        view = View.query.get(int(view_id))
+        if view:
+            view_symbol = view.name[0].upper()
+            # 🔄 Фильтруем категории по выбранному виду
+            categories = Category.query.filter_by(view_id=view.id).order_by(Category.name).all()
+    else:
+        view_id = None
+
+    # 🔠 Получаем первые 2 буквы названия категории
+    category_code = category_name[:2].upper() if category_name else "XX"
+
+    # 🛠 Формируем артикул
+    article_code = f"{view_symbol}{category_code}{level}-{model}{color}{weight}-{blocks}{details}-{prefix}"
+
+    # 🚫 Проверка на пустой код
     if not article_code:
         flash('Ошибка: Код артикула пустой.', 'danger')
-        return redirect(url_for('main.index'))
+        return render_template('index.html',
+                               views=views,
+                               categories=categories,
+                               selected_view_id=view_id,
+                               selected_category_name=category_name)
 
+    # 🚫 Проверка на дубликат
     existing = Article.query.filter_by(code=article_code).first()
     if existing:
         flash('Такой артикул уже существует!', 'warning')
-    else:
-        new_article = Article(code=article_code, description=description)
-        db.session.add(new_article)
-        db.session.commit()
-        flash('Артикул успешно создан.', 'success')
+        return render_template('index.html',
+                               views=views,
+                               categories=categories,
+                               selected_view_id=view_id,
+                               selected_category_name=category_name)
 
+    # ✅ Сохраняем в базу
+    new_article = Article(code=article_code, description=description)
+    db.session.add(new_article)
+    db.session.commit()
+
+    flash(f'Артикул {article_code} успешно создан.', 'success')
     return redirect(url_for('main.list_articles'))
+
 
 # 🔹 Маршрут для отображения всех артикулов
 @main.route('/articles')
@@ -201,4 +244,11 @@ def delete_view(view_id):
 def list_views():
     views = View.query.order_by(View.name).all()
     return render_template('list_views.html', views=views)
+
+@main.route('/api/categories/<int:view_id>')
+def get_categories(view_id):
+    categories = Category.query.filter_by(view_id=view_id).order_by(Category.name).all()
+    data = [{'name': c.name} for c in categories]
+    return jsonify(data)
+
 

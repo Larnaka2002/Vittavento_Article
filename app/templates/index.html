@@ -1,208 +1,229 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Vittavento Article Generator</title>
-    <!-- Подключение CSS файла -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+      .inline-form { display: contents; }
+    </style>
 </head>
 <body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-    <!-- Блок для Flash-сообщений -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash-message {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+  <div class="container">
+    <h1>Vittavento Article Generator</h1>
 
+    <!-- ОДНА общая форма -->
+    <form method="POST" action="{{ url_for('main.generator') }}">
+      <div class="code-container">
 
+        <!-- ВИД -->
+        <div class="symbol-block group group-1">
+          <select class="symbol-select" name="view" id="view-select">
+            {% for v in views %}
+              <option value="{{ v.id }}" {% if selected_view_id == v.id|string %}selected{% endif %}>{{ v.name }}</option>
+            {% endfor %}
+            <option value="add_new">+ Добавить новый вид</option>
+          </select>
+        </div>
 
-    <div class="container">
-        <h1>Vittavento Article Generator</h1>
-
-        <!-- Форма генерации артикула -->
-        <form method="POST" action="{{ url_for('main.generator') }}">
-            <div class="code-container">
-
-                <!-- Выпадающий список выбора вида изделия -->
-                <div class="symbol-block group group-1">
-                  <select class="symbol-select" name="view" onchange="if (this.value === 'add_new') window.location.href='/add_view'">
-                    {% for v in views %}
-                      <option value="{{ v.name }}">{{ v.name }}</option>
-                    {% endfor %}
-                    <option value="add_new">+ Добавить новый вид</option>
-                  </select>
-                </div>
-
-                <!-- Категория (2 символа) — как часть артикула -->
-                <div class="symbol-block group-2">
-                    <select name="category" class="symbol-select" id="category-select">
-                        {% for category in categories %}
-                            <option value="{{ category.name }}">{{ category.name[:2].upper() }}</option>
-                        {% endfor %}
-                        <option value="add_new">+ Добавить новую категорию</option>
-                    </select>
-                </div>
-
-
-                <!-- Уровень изделия -->
-                <div class="symbol-block single">
-                    <select name="level" class="symbol-select">
-                       <option value="1">1</option>
-                       <option value="2">2</option>
-                       <option value="3">3</option>
-                       <option value="4">4</option>
-                    </select>
-                </div>
-
-                <div class="dash">-</div>
-
-                <!-- Модель изделия -->
-                <div class="symbol-block group group-2">
-                    <select name="model" class="symbol-select">
-                        <option>11</option>
-                        <option>23</option>
-                    </select>
-                </div>
-
-                <!-- Цвет изделия -->
-                <div class="symbol-block group group-2">
-                    <select name="color" class="symbol-select">
-                        <option>45</option>
-                        <option>99</option>
-                    </select>
-                </div>
-
-                <!-- Вес изделия -->
-                <div class="symbol-block group group-3">
-                    <select name="weight" class="symbol-select">
-                        <option>123</option>
-                        <option>345</option>
-                    </select>
-                </div>
-
-                <div class="dash">-</div>
-
-                <!-- Блок изделия -->
-                <div class="symbol-block group group-2">
-                    <select name="blocks" class="symbol-select">
-                        <option>01</option>
-                        <option>02</option>
-                    </select>
-                </div>
-
-                <!-- Детали изделия -->
-                <div class="symbol-block group group-2">
-                    <select name="details" class="symbol-select">
-                        <option>02</option>
-                        <option>03</option>
-                    </select>
-                </div>
-
-                <div class="dash">-</div>
-
-            </div>
-
-            <!-- Блок с описанием артикула (с красивой рамкой) -->
-            <div class="description-block">
-                <label for="article_description">Описание артикула</label>
-                <textarea id="article_description" name="article_description" rows="4" placeholder="Введите описание..."></textarea>
-            </div>
+        <!-- КАТЕГОРИЯ -->
+        <div class="symbol-block group-2">
+          <select name="category" class="symbol-select" id="category-select">
+            {% if categories %}
+              {% for category in categories %}
+                <option value="{{ category.name }}" {% if selected_category_name == category.name %}selected{% endif %}>
+                  {{ category.name[:2].upper() }}
+                </option>
+              {% endfor %}
+            {% else %}
+              <option value="none" disabled selected>Нет категорий</option>
+            {% endif %}
+            <option value="add_new">+ Добавить новую категорию</option>
+          </select>
+        </div>
 
 
-            <!-- Кнопки для генерации и перехода к списку артикулов -->
-            <div class="button-container">
-                <button type="submit" class="start-button">СГЕНЕРИРОВАТЬ</button>
-                <a href="{{ url_for('main.list_articles') }}" class="start-button">Список артикулов</a>
-            </div>
+        <!-- УРОВЕНЬ -->
+        <div class="symbol-block single">
+          <select name="level" class="symbol-select">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
 
-            <!-- Скрытые поля для передачи данных -->
-            <input type="hidden" name="article_code" id="article_code">
-            <input type="hidden" name="prefix" id="prefix">
+        <div class="dash">-</div>
 
-        </form>
-    </div>
+        <!-- МОДЕЛЬ -->
+        <div class="symbol-block group group-2">
+          <select name="model" class="symbol-select">
+            <option>11</option>
+            <option>23</option>
+          </select>
+        </div>
 
-    <!-- Функция для перенаправления при выборе добавления нового вида -->
-    <script>
-        function handleViewChange(selectElement) {
-            if (selectElement.value === "add_new") {
-                window.location.href = "{{ url_for('main.add_view') }}";
-            }
-        }
-    </script>
+        <!-- ЦВЕТ -->
+        <div class="symbol-block group group-2">
+          <select name="color" class="symbol-select">
+            <option>45</option>
+            <option>99</option>
+          </select>
+        </div>
 
-    <!-- Основной скрипт генерации артикула -->
-    <script>
+        <!-- ВЕС -->
+        <div class="symbol-block group group-3">
+          <select name="weight" class="symbol-select">
+            <option>123</option>
+            <option>345</option>
+          </select>
+        </div>
+
+        <div class="dash">-</div>
+
+        <!-- БЛОК -->
+        <div class="symbol-block group group-2">
+          <select name="blocks" class="symbol-select">
+            <option>01</option>
+            <option>02</option>
+          </select>
+        </div>
+
+        <!-- ДЕТАЛИ -->
+        <div class="symbol-block group group-2">
+          <select name="details" class="symbol-select">
+            <option>02</option>
+            <option>03</option>
+          </select>
+        </div>
+
+        <div class="dash">-</div>
+      </div>
+
+      <!-- ОПИСАНИЕ -->
+      <div class="description-block">
+        <label for="article_description">Описание артикула</label>
+        <textarea id="article_description" name="article_description" rows="4" placeholder="Введите описание..."></textarea>
+      </div>
+
+      <!-- КНОПКИ -->
+      <div class="button-container">
+        <button type="submit" class="start-button">СГЕНЕРИРОВАТЬ</button>
+        <a href="{{ url_for('main.list_articles') }}" class="start-button">Список артикулов</a>
+      </div>
+
+      <!-- СКРЫТЫЕ ПОЛЯ -->
+      <input type="hidden" name="article_code" id="article_code">
+      <input type="hidden" name="prefix" id="prefix">
+    </form>
+  </div>
+
+  <!-- JS для генерации артикула -->
+  <script>
     document.querySelector('form').addEventListener('submit', async function (e) {
-        e.preventDefault();  // Останавливаем стандартную отправку формы
+      e.preventDefault();
 
-        // Собираем все выбранные значения из выпадающих списков
-        const symbols = [...document.querySelectorAll('.symbol-select')];
-        const rawCode = symbols.map(el => el.value).join('');
+      const symbols = [...document.querySelectorAll('.symbol-select')];
+      const rawCode = symbols.map(el => el.value).join('');
 
-        // Разбиваем код на логические части
-        const articleCodeParts = [
-            rawCode.slice(0, 4),   // Вид изделия
-            rawCode.slice(4, 11),  // Категория и уровень
-            rawCode.slice(11, 15), // Модель и цвет
-            rawCode.slice(15)      // Блок и детали
-        ];
+      const articleCodeParts = [
+        rawCode.slice(0, 4),
+        rawCode.slice(4, 11),
+        rawCode.slice(11, 15),
+        rawCode.slice(15)
+      ];
 
-        // Создаем код артикула без префикса
-        const partialCode = articleCodeParts.slice(0, 3).join('-');
-        let nextPrefix = 1;
+      const partialCode = articleCodeParts.slice(0, 3).join('-');
+      let nextPrefix = 1;
 
-        // Отправляем запрос на сервер для получения следующего префикса
+      try {
+        const response = await fetch('/get_prefix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ partial_code: partialCode })
+        });
+        const data = await response.json();
+        nextPrefix = data.prefix || 1;
+      } catch (error) {
+        console.error('Ошибка при получении префикса:', error);
+      }
+
+      articleCodeParts.push(nextPrefix);
+      const fullCode = articleCodeParts.join('-');
+
+      document.getElementById('article_code').value = fullCode;
+      document.getElementById('prefix').value = nextPrefix;
+
+      const descField = document.getElementById('article_description');
+      if (!descField.value) {
+        descField.value = 'Сгенерированный артикул';
+      }
+
+      e.target.submit();
+    });
+  </script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const viewSelect = document.getElementById("view-select");
+    const categorySelect = document.getElementById("category-select");
+
+    if (viewSelect && categorySelect) {
+      viewSelect.addEventListener("change", async function () {
+        const viewId = this.value;
+        categorySelect.innerHTML = ""; // очищаем
+
+        if (viewId === "add_new") {
+          window.location.href = "{{ url_for('main.add_view') }}";
+          return;
+        }
+
         try {
-            const response = await fetch('/get_prefix', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ partial_code: partialCode })
+          const res = await fetch(`/api/categories/${viewId}`);
+          const categories = await res.json();
+
+          if (categories.length === 0) {
+            const opt = document.createElement("option");
+            opt.text = "Нет категорий";
+            opt.disabled = true;
+            opt.selected = true;
+            categorySelect.add(opt);
+          } else {
+            categories.forEach(c => {
+              const opt = document.createElement("option");
+              opt.value = c.name;
+              opt.text = c.name.slice(0, 2).toUpperCase();
+              categorySelect.add(opt);
             });
+          }
 
-            const data = await response.json();
-            nextPrefix = data.prefix || 1;
-        } catch (error) {
-            console.error('Ошибка при получении префикса:', error);
+          // Добавить пункт “+ Добавить новую категорию”
+          const addNew = document.createElement("option");
+          addNew.value = "add_new";
+          addNew.text = "+ Добавить новую категорию";
+          categorySelect.add(addNew);
+        } catch (err) {
+          console.error("Ошибка загрузки категорий:", err);
         }
+      });
 
-        // Добавляем префикс к полному коду артикула
-        articleCodeParts.push(nextPrefix);
-        const fullCode = articleCodeParts.join('-');
-
-        // Заполняем скрытые поля формы перед отправкой
-        const descriptionField = document.getElementById('article_description');
-        const description = descriptionField.value || 'Сгенерированный артикул';
-
-        document.getElementById('article_code').value = fullCode;
-        document.getElementById('prefix').value = nextPrefix;
-        document.getElementById('article_description').value = description;
-
-        // Логирование для отладки
-        console.log('Отправка:', fullCode, description);
-
-        // Отправляем форму
-        e.target.submit();
-    });
-    </script>
-
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const categorySelect = document.querySelector("select[name='category']");
-        if (categorySelect) {
-            categorySelect.addEventListener("change", function() {
-                if (this.value === "add_new") {
-                    window.location.href = "{{ url_for('main.add_category') }}";
-                }
-            });
+      categorySelect.addEventListener("change", function () {
+        if (this.value === "add_new") {
+          window.location.href = "{{ url_for('main.add_category') }}";
         }
-    });
-    </script>
+      });
+    }
+  });
+  </script>
 
 </body>
 </html>
