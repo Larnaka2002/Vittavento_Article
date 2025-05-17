@@ -17,6 +17,28 @@ class View(db.Model):
     def __repr__(self):
         return f'<View id={self.id} name={self.name}>'
 
+# Категория изделия, связанная с определённым видом
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Название категории (например, "GLASS" или "METAL")
+    name = db.Column(db.String(50), nullable=False)
+
+    # Описание категории (опционально)
+    description = db.Column(db.Text)
+
+    # Связь с видом изделия (обязательна)
+    view_id = db.Column(db.Integer, db.ForeignKey('view.id'), nullable=False)
+
+    # Отношение к модели View
+    view = db.relationship('View', backref=db.backref('categories', lazy=True))
+
+    # Уникальность категории в рамках одного вида
+    __table_args__ = (
+        db.UniqueConstraint('view_id', 'name', name='uix_view_category'),
+    )
+
+
 # 🔹 Модель "Артикул изделия"
 class Article(db.Model):
     # Уникальный идентификатор артикула

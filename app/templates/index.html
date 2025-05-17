@@ -36,14 +36,16 @@
                   </select>
                 </div>
 
-                <!-- Категория изделия -->
-                <div class="symbol-block group group-2">
-                    <select name="category" class="symbol-select">
-                        <option>BC</option>
-                        <option>MI</option>
-                        <option>GL</option>
+                <!-- Категория (2 символа) — как часть артикула -->
+                <div class="symbol-block group-2">
+                    <select name="category" class="symbol-select" id="category-select">
+                        {% for category in categories %}
+                            <option value="{{ category.name }}">{{ category.name[:2].upper() }}</option>
+                        {% endfor %}
+                        <option value="add_new">+ Добавить новую категорию</option>
                     </select>
                 </div>
+
 
                 <!-- Уровень изделия -->
                 <div class="symbol-block single">
@@ -188,5 +190,19 @@
         e.target.submit();
     });
     </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const categorySelect = document.querySelector("select[name='category']");
+        if (categorySelect) {
+            categorySelect.addEventListener("change", function() {
+                if (this.value === "add_new") {
+                    window.location.href = "{{ url_for('main.add_category') }}";
+                }
+            });
+        }
+    });
+    </script>
+
 </body>
 </html>

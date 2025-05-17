@@ -4,10 +4,11 @@
 from flask_wtf import FlaskForm
 
 # 🔹 Импорт полей формы
-from wtforms import StringField, SubmitField, TextAreaField
+from wtforms import StringField, TextAreaField, SelectField, SubmitField
 
 # 🔹 Импорт валидаторов
 from wtforms.validators import DataRequired
+
 
 # 🔹 Форма для добавления нового Вида изделия
 class ViewForm(FlaskForm):
@@ -24,6 +25,20 @@ class ViewForm(FlaskForm):
 
     submit = SubmitField('Добавить')
 
+
+class CategoryForm(FlaskForm):
+    # Список доступных видов изделия
+    view = SelectField('Выберите Вид', coerce=int, validators=[DataRequired()])
+
+    # Название категории
+    name = StringField('Название категории', validators=[DataRequired()])
+
+    # Описание категории (опционально)
+    description = TextAreaField('Описание категории')
+
+    submit = SubmitField('Добавить категорию')
+
+
 # 🔹 Форма для редактирования Артикула
 class EditArticleForm(FlaskForm):
     description = TextAreaField(
@@ -31,3 +46,9 @@ class EditArticleForm(FlaskForm):
         validators=[DataRequired(message="Поле обязательно для заполнения")]
     )
     submit = SubmitField('Сохранить изменения')
+
+from flask_wtf import FlaskForm
+
+# Простая форма фильтрации вида и категории
+class FilterForm(FlaskForm):
+    pass  # пока пустая, нужна только для {{ form.hidden_tag() }}

@@ -2,9 +2,13 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 
 # Импорты проекта
-from app import db
 from app.models import View, Article
 from app.forms import ViewForm, EditArticleForm  # Добавили импорт новой формы
+from app.forms import CategoryForm
+from app.models import Category, View
+from flask import render_template, redirect, url_for, flash, request
+from app import db
+
 
 # 🔹 Создание Blueprint для маршрутов
 main = Blueprint('main', __name__)
@@ -36,11 +40,54 @@ def add_view():
     return render_template('add_view.html', form=form)
 
 
+@main.route('/add_category', methods=['GET', 'POST'])
+def add_category():
+    form = CategoryForm()
+
+    # Заполняем список видов для SelectField
+    form.view.choices = [(v.id, v.name) for v in View.query.order_by(View.name).all()]
+
+    if form.validate_on_submit():
+        # Проверка на дубликат в пределах одного вида
+        existing = Category.query.filter_by(name=form.name.data, view_id=form.view.data).first()
+        if existing:
+            flash('Такая категория уже существует в этом виде!', 'warning')
+        else:
+            category = Category(
+                name=form.name.data,
+                description=form.description.data,
+                view_id=form.view.data
+            )
+            db.session.add(category)
+            db.session.commit()
+            flash('Категория успешно добавлена!', 'success')
+            return redirect(url_for('main.index'))
+
+    return render_template('add_category.html', form=form)
+
+
 # 🔹 Главная страница - список всех Видов изделий
-@main.route('/')
+@main.route('/', methods=['GET', 'POST'])
 def index():
+    from app.forms import FilterForm
+    form = FilterForm()
+
     views = View.query.order_by(View.name).all()
-    return render_template('index.html', views=views)
+    selected_view_id = request.form.get("view")
+
+    categories = []
+    if selected_view_id and selected_view_id != "add_new":
+        try:
+            selected_view_id_int = int(selected_view_id)
+            categories = Category.query.filter_by(view_id=selected_view_id_int).order_by(Category.name).all()
+        except ValueError:
+            categories = []
+
+    return render_template('index.html',
+                           views=views,
+                           categories=categories,
+                           selected_view_id=selected_view_id,
+                           form=form)
 
 
 # --- Маршруты работы с Артикулами ---

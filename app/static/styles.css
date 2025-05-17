@@ -340,3 +340,34 @@ body {
     height: 60px;
 }
 
+/* ================== Flash и контейнер ================== */
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.flash-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.flash {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+.flash.success {
+    background-color: #4caf50;
+}
+
+.flash.warning {
+    background-color: #f44336;
+}
+
+
