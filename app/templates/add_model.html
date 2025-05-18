@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="page-title">Добавить новую модель</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-block">
+        {{ form.view.label }}<br>
+        {{ form.view(class_="pretty-input", onchange="this.form.submit();") }}
+    </div>
+
+    <div class="form-block">
+        {{ form.category.label }}<br>
+        {{ form.category(class_="pretty-input") }}
+    </div>
+
+    <div class="form-block">
+        {{ form.name.label }}<br>
+        {{ form.name(class_="pretty-input") }}
+    </div>
+
+    <div class="form-block">
+        {{ form.code.label }}<br>
+        {{ form.code(class_="pretty-input") }}
+    </div>
+
+    <div class="form-block">
+        {{ form.description.label }}<br>
+        {{ form.description(class_="pretty-input") }}
+    </div>
+
+    <div class="form-actions">
+        {{ form.submit(class_="start-button") }}
+        <a href="{{ url_for('main.index') }}" class="back-link">← Назад</a>
+    </div>
+</form>
+
+{% endblock %}

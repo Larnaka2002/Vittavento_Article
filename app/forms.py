@@ -8,6 +8,7 @@ from wtforms import StringField, TextAreaField, SelectField, SubmitField
 
 # 🔹 Импорт валидаторов
 from wtforms.validators import DataRequired
+from wtforms import SelectField
 
 
 # 🔹 Форма для добавления нового Вида изделия
@@ -37,6 +38,17 @@ class CategoryForm(FlaskForm):
     description = TextAreaField('Описание категории')
 
     submit = SubmitField('Добавить категорию')
+
+
+# 🔧 Форма добавления модели изделия
+class ModelForm(FlaskForm):
+    view = SelectField('Вид', coerce=int, validators=[DataRequired()])
+    category = SelectField('Категория', coerce=int, validators=[DataRequired()])
+    name = StringField('Название модели', validators=[DataRequired()])
+    code = StringField('Код модели (2 цифры)', validators=[DataRequired()])
+    description = TextAreaField('Описание модели')
+    submit = SubmitField('Добавить модель')
+
 
 
 # 🔹 Форма для редактирования Артикула

@@ -52,3 +52,34 @@ class Article(db.Model):
 
     def __repr__(self):
         return f'<Article id={self.id} code={self.code}>'
+
+# 🔧 Модель изделия — привязана к виду и категории, используется в артикулах (2 цифры: 01, 12 и т.д.)
+class Model(db.Model):
+    __tablename__ = 'model'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Название модели (например, "Classic", "Urban")
+    name = db.Column(db.String(50), nullable=False)
+
+    # Код модели для артикула (две цифры: "01", "12")
+    code = db.Column(db.String(2), nullable=False)
+
+    # Описание модели (необязательно)
+    description = db.Column(db.Text)
+
+    # Привязка к виду
+    view_id = db.Column(db.Integer, db.ForeignKey('view.id'), nullable=False)
+    view = db.relationship('View', backref=db.backref('models', lazy=True))
+
+    # Привязка к категории
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    category = db.relationship('Category', backref=db.backref('models', lazy=True))
+
+    # Уникальность: в пределах вида и категории код модели должен быть уникален
+    __table_args__ = (
+        db.UniqueConstraint('view_id', 'category_id', 'code', name='uix_view_category_model_code'),
+    )
+
+    def __repr__(self):
+        return f"<Model {self.code} - {self.name}>"

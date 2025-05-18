@@ -64,11 +64,16 @@
 
         <div class="dash">-</div>
 
-        <!-- МОДЕЛЬ -->
-        <div class="symbol-block group group-2">
-          <select name="model" class="symbol-select">
-            <option>11</option>
-            <option>23</option>
+        <!-- МОДЕЛЬ (4-й блок артикула) -->
+        <div class="symbol-block double-symbol">
+          <select name="model" id="model-select" class="symbol-select">
+            <option value="">--</option>
+            {% for m in models %}
+              <option value="{{ m.code }}" {% if selected_model_code == m.code %}selected{% endif %}>
+                {{ m.code }}
+              </option>
+            {% endfor %}
+            <option value="add_new">+ Добавить новую модель</option>
           </select>
         </div>
 
@@ -224,6 +229,16 @@
     }
   });
   </script>
+
+  <script>
+  document.getElementById('model-select').addEventListener('change', function() {
+    if (this.value === 'add_new') {
+      window.location.href = '/add_model';
+    }
+  });
+  </script>
+
+
 
 </body>
 </html>
