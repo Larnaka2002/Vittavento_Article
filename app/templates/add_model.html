@@ -37,4 +37,51 @@
     </div>
 </form>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Получаем элементы выпадающих списков
+    const viewSelect = document.querySelector("select[name='view']");
+    const categorySelect = document.querySelector("select[name='category']");
+
+    if (viewSelect && categorySelect) {
+        // При выборе вида...
+        viewSelect.addEventListener("change", async function () {
+            const viewId = this.value;
+
+            // Очищаем текущие опции категории
+            categorySelect.innerHTML = "";
+
+            if (!viewId) return; // если ничего не выбрано — выходим
+
+            try {
+                // Отправляем запрос на сервер за категориями
+                const res = await fetch(`/api/categories/${viewId}`);
+                const categories = await res.json();
+
+                // Если ничего не пришло — показываем "Нет категорий"
+                if (categories.length === 0) {
+                    const opt = document.createElement("option");
+                    opt.text = "Нет категорий";
+                    opt.disabled = true;
+                    opt.selected = true;
+                    categorySelect.add(opt);
+                } else {
+                    // Заполняем выпадающий список категориями
+                    categories.forEach(c => {
+                        const opt = document.createElement("option");
+                        opt.value = c.id;
+                        opt.text = c.name;
+                        categorySelect.add(opt);
+                    });
+                }
+
+            } catch (err) {
+                console.error("Ошибка загрузки категорий:", err);
+            }
+        });
+    }
+});
+</script>
+
+
 {% endblock %}

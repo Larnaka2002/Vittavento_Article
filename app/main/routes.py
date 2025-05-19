@@ -77,53 +77,46 @@ def add_category():
 @main.route('/api/categories/<int:view_id>')
 def get_categories(view_id):
     categories = Category.query.filter_by(view_id=view_id).order_by(Category.name).all()
-    data = [{'name': c.name} for c in categories]
+    data = [{'id': c.id, 'name': c.name} for c in categories]
     return jsonify(data)
+
 
 
 # --- МОДЕЛИ ---
 
 @main.route('/add_model', methods=['GET', 'POST'])
 def add_model():
-    form = ModelForm(request.form)
+    form = ModelForm()
     views = View.query.order_by(View.name).all()
     form.view.choices = [(v.id, v.name) for v in views]
-    selected_view_id = request.form.get('view', type=int)
 
-    if selected_view_id:
-        form.view.data = selected_view_id
-        form.category.choices = [
-            (c.id, c.name) for c in Category.query.filter_by(view_id=selected_view_id).order_by(Category.name)
-        ]
-    else:
-        form.category.choices = []
+    # Найди и удали или закомментируй это:
+    # if form.view.data:
+    #     form.category.choices = ...
+    # else:
+    #     form.category.choices = []
+
+    # Вместо этого — просто:
+    form.category.choices = []
+    # Очищаем список категорий — он будет заполняться на клиенте (JavaScript)
 
     if form.validate_on_submit():
-        existing = Model.query.filter_by(
+        model = Model(
+            name=form.name.data,
+            code=form.code.data,
+            description=form.description.data,
             view_id=form.view.data,
-            category_id=form.category.data,
-            code=form.code.data
-        ).first()
-        if existing:
-            flash('Модель с таким кодом уже существует в выбранной категории!', 'warning')
-        else:
-            new_model = Model(
-                name=form.name.data,
-                code=form.code.data,
-                description=form.description.data,
-                view_id=form.view.data,
-                category_id=form.category.data
-            )
-            db.session.add(new_model)
-            db.session.commit()
-            flash('Модель успешно добавлена!', 'success')
-            return redirect(url_for('main.index'))
+            category_id=form.category.data
+        )
+        db.session.add(model)
+        db.session.commit()
+        flash("Модель успешно добавлена!", "success")
+        return redirect(url_for("main.index"))
 
-    return render_template('add_model.html', form=form)
+    return render_template("add_model.html", form=form)
 
 
 # --- ГЛАВНАЯ (ГЕНЕРАТОР) ---
-
 @main.route('/', methods=['GET', 'POST'])
 def index():
     views = View.query.order_by(View.name).all()
@@ -131,14 +124,18 @@ def index():
     category_id = request.form.get('category', type=int)
     model_code = request.form.get('model')
 
+    # Категории по выбранному виду
     if view_id:
         categories = Category.query.filter_by(view_id=view_id).order_by(Category.name).all()
+
+        # Если выбрана и категория — фильтруем точнее
+        if category_id:
+            models = Model.query.filter_by(view_id=view_id, category_id=category_id).order_by(Model.code).all()
+        else:
+            # Если категория не выбрана — берём все модели этого вида
+            models = Model.query.filter_by(view_id=view_id).order_by(Model.code).all()
     else:
         categories = []
-
-    if view_id and category_id:
-        models = Model.query.filter_by(view_id=view_id, category_id=category_id).order_by(Model.code).all()
-    else:
         models = []
 
     return render_template(
@@ -150,6 +147,7 @@ def index():
         selected_category_id=category_id,
         selected_model_code=model_code
     )
+
 
 
 # --- ГЕНЕРАЦИЯ АРТИКУЛА ---

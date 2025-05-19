@@ -43,7 +43,7 @@ class CategoryForm(FlaskForm):
 # 🔧 Форма добавления модели изделия
 class ModelForm(FlaskForm):
     view = SelectField('Вид', coerce=int, validators=[DataRequired()])
-    category = SelectField('Категория', coerce=int, validators=[DataRequired()])
+    category = SelectField('Категория', coerce=int, validators=[DataRequired()], validate_choice=False)
     name = StringField('Название модели', validators=[DataRequired()])
     code = StringField('Код модели (2 цифры)', validators=[DataRequired()])
     description = TextAreaField('Описание модели')
@@ -59,7 +59,6 @@ class EditArticleForm(FlaskForm):
     )
     submit = SubmitField('Сохранить изменения')
 
-from flask_wtf import FlaskForm
 
 # Простая форма фильтрации вида и категории
 class FilterForm(FlaskForm):
