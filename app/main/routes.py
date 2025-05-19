@@ -80,6 +80,18 @@ def get_categories(view_id):
     data = [{'id': c.id, 'name': c.name} for c in categories]
     return jsonify(data)
 
+@main.route('/api/models/<int:view_id>/<int:category_id>')
+def get_models(view_id, category_id):
+    """
+    Возвращает список моделей для выбранного вида и категории
+    в формате JSON: [{'code': '12', 'description': 'дверь стеклянная'}, ...]
+    """
+    from app.models import Model
+
+    models = Model.query.filter_by(view_id=view_id, category_id=category_id).order_by(Model.code).all()
+    data = [{'code': m.code, 'description': m.description or ''} for m in models]
+    return jsonify(data)
+
 
 
 # --- МОДЕЛИ ---
