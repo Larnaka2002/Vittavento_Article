@@ -35,12 +35,12 @@
           </select>
         </div>
 
-        <!-- КАТЕГОРИЯ -->
+        <!-- КАТЕГОРИЯ (вторая и третья буквы артикула). Фильтруется по виду. -->
         <div class="symbol-block group-2">
           <select name="category" class="symbol-select" id="category-select">
             {% if categories %}
               {% for category in categories %}
-                <option value="{{ category.name }}" {% if selected_category_name == category.name %}selected{% endif %}>
+                <option value="{{ category.name }}" data-id="{{ category.id }}" {% if selected_category_name == category.name %}selected{% endif %}>
                   {{ category.name[:2].upper() }}
                 </option>
               {% endfor %}
@@ -128,8 +128,119 @@
     </form>
   </div>
 
-  <!-- JS для генерации артикула -->
-  <script>
+    <!-- JS: Подгрузка категорий и моделей, генерация артикула -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const viewSelect = document.getElementById("view-select");
+      const categorySelect = document.getElementById("category-select");
+      const modelSelect = document.getElementById("model-select");
+      const descriptionTextarea = document.getElementById("article_description");
+
+      // --- Подгружаем категории при выборе Вида ---
+      viewSelect.addEventListener("change", async function () {
+        const viewId = this.value;
+        categorySelect.innerHTML = "";
+
+        if (viewId === "add_new") {
+          window.location.href = "/add_view";
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/categories/${viewId}`);
+          const categories = await res.json();
+
+          if (categories.length === 0) {
+            const opt = document.createElement("option");
+            opt.text = "Нет категорий";
+            opt.disabled = true;
+            opt.selected = true;
+            categorySelect.add(opt);
+          } else {
+            categories.forEach(c => {
+              const opt = document.createElement("option");
+              opt.value = c.name;
+              opt.text = c.name.slice(0, 2).toUpperCase();
+              opt.dataset.id = c.id;
+              categorySelect.add(opt);
+            });
+          }
+
+          const addNew = document.createElement("option");
+          addNew.value = "add_new";
+          addNew.text = "+ Добавить новую категорию";
+          categorySelect.add(addNew);
+        } catch (err) {
+          console.error("Ошибка загрузки категорий:", err);
+        }
+      });
+
+      // --- Переход по "Добавить категорию" ---
+      categorySelect.addEventListener("change", function () {
+        if (this.value === "add_new") {
+          window.location.href = "/add_category";
+        }
+      });
+
+      // --- Подгружаем модели при выборе Вида или Категории ---
+      async function loadModels() {
+        const viewId = viewSelect.value;
+        const selectedCategory = categorySelect.selectedOptions[0];
+        const categoryId = selectedCategory ? selectedCategory.dataset.id : null;
+
+        modelSelect.innerHTML = "";
+
+        if (!viewId || !categoryId || selectedCategory.value === "add_new") return;
+
+        try {
+          const res = await fetch(`/api/models/${viewId}/${categoryId}`);
+          const models = await res.json();
+
+          if (models.length === 0) {
+            const opt = document.createElement("option");
+            opt.text = "Нет моделей";
+            opt.disabled = true;
+            opt.selected = true;
+            modelSelect.appendChild(opt);
+          } else {
+            models.forEach(m => {
+              const opt = document.createElement("option");
+              opt.value = m.code;
+              opt.text = m.code;
+              opt.dataset.description = m.description || "";
+              modelSelect.appendChild(opt);
+            });
+          }
+
+          const addNew = document.createElement("option");
+          addNew.value = "add_new";
+          addNew.text = "+ Добавить новую модель";
+          modelSelect.appendChild(addNew);
+
+        } catch (err) {
+          console.error("Ошибка загрузки моделей:", err);
+        }
+      }
+
+      viewSelect.addEventListener("change", loadModels);
+      categorySelect.addEventListener("change", loadModels);
+
+      // --- Автозаполнение описания по модели ---
+      modelSelect.addEventListener("change", function () {
+        const selected = this.selectedOptions[0];
+        if (selected && selected.dataset.description && !descriptionTextarea.value) {
+          descriptionTextarea.value = selected.dataset.description;
+        }
+
+        if (this.value === "add_new") {
+          window.location.href = "/add_model";
+        }
+      });
+    });
+    </script>
+
+    <!-- JS: Генерация артикула -->
+    <script>
     document.querySelector('form').addEventListener('submit', async function (e) {
       e.preventDefault();
 
@@ -171,138 +282,7 @@
 
       e.target.submit();
     });
-  </script>
-
-  <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const viewSelect = document.getElementById("view-select");
-    const categorySelect = document.getElementById("category-select");
-
-    if (viewSelect && categorySelect) {
-      viewSelect.addEventListener("change", async function () {
-        const viewId = this.value;
-        categorySelect.innerHTML = ""; // очищаем
-
-        if (viewId === "add_new") {
-          window.location.href = "{{ url_for('main.add_view') }}";
-          return;
-        }
-
-        try {
-          const res = await fetch(`/api/categories/${viewId}`);
-          const categories = await res.json();
-
-          if (categories.length === 0) {
-            const opt = document.createElement("option");
-            opt.text = "Нет категорий";
-            opt.disabled = true;
-            opt.selected = true;
-            categorySelect.add(opt);
-          } else {
-            categories.forEach(c => {
-              const opt = document.createElement("option");
-              opt.value = c.name;
-              opt.text = c.name.slice(0, 2).toUpperCase();
-              categorySelect.add(opt);
-            });
-          }
-
-          // Добавить пункт “+ Добавить новую категорию”
-          const addNew = document.createElement("option");
-          addNew.value = "add_new";
-          addNew.text = "+ Добавить новую категорию";
-          categorySelect.add(addNew);
-        } catch (err) {
-          console.error("Ошибка загрузки категорий:", err);
-        }
-      });
-
-      categorySelect.addEventListener("change", function () {
-        if (this.value === "add_new") {
-          window.location.href = "{{ url_for('main.add_category') }}";
-        }
-      });
-    }
-  });
-  </script>
-
-  <script>
-  document.getElementById('model-select').addEventListener('change', function() {
-    if (this.value === 'add_new') {
-      window.location.href = '/add_model';
-    }
-  });
-  </script>
-
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const viewSelect = document.getElementById("view-select");
-      const categorySelect = document.getElementById("category-select");
-      const modelSelect = document.getElementById("model-select");
-      const descriptionTextarea = document.getElementById("article_description");
-
-    // Загружаем модели при изменении вида или категории
-      async function loadModels() {
-          const viewId = viewSelect.value;
-          const categoryId = categorySelect.value;
-
-        // очищаем модели
-          modelSelect.innerHTML = "";
-
-          if (!viewId || !categoryId || categoryId === "add_new") return;
-
-          try {
-              const res = await fetch(`/api/models/${viewId}/${categoryId}`);
-              const models = await res.json();
-
-              if (models.length === 0) {
-                  const opt = document.createElement("option");
-                  opt.text = "Нет моделей";
-                  opt.disabled = true;
-                  opt.selected = true;
-                  modelSelect.add(opt);
-              } else {
-                  models.forEach(m => {
-                      const opt = document.createElement("option");
-                      opt.value = m.code;
-                      opt.text = m.code;
-                      opt.dataset.description = m.description || "";
-                      modelSelect.insertBefore(opt, modelSelect.querySelector('option[value="add_new"]'));
-                  });
-
-                // Добавляем пункт "Добавить новую модель"
-                  const addNew = document.createElement("option");
-                  addNew.value = "add_new";
-                  addNew.text = "+ Добавить новую модель";
-                  modelSelect.add(addNew);
-              }
-
-          } catch (err) {
-              console.error("Ошибка загрузки моделей:", err);
-          }
-      }
-
-    // При выборе вида или категории — загружаем модели
-      if (viewSelect) viewSelect.addEventListener("change", loadModels);
-      if (categorySelect) categorySelect.addEventListener("change", loadModels);
-
-    // При выборе модели — заполняем описание
-      if (modelSelect) {
-          modelSelect.addEventListener("change", function () {
-              const selected = this.selectedOptions[0];
-              if (selected && selected.dataset.description && !descriptionTextarea.value) {
-                  descriptionTextarea.value = selected.dataset.description;
-              }
-
-              if (this.value === "add_new") {
-                  window.location.href = "/add_model";
-              }
-          });
-      }
-  });
-  </script>
-
-
+    </script>
 
 </body>
 </html>
