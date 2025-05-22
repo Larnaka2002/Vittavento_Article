@@ -73,13 +73,16 @@
         </div>
 
 
-        <!-- ЦВЕТ -->
+        <!-- ЦВЕТ (пятый блок артикула) -->
         <div class="symbol-block group group-2">
-          <select name="color" class="symbol-select">
-            <option>45</option>
-            <option>99</option>
+          <select name="color" class="symbol-select" id="color-select">
+            {% for color in colors %}
+              <option value="{{ color.code }}">{{ color.code }} – {{ color.name }}</option>
+            {% endfor %}
+            <option value="add_new">+ Добавить цвет</option>
           </select>
         </div>
+
 
         <!-- ВЕС -->
         <div class="symbol-block group group-3">
@@ -283,6 +286,20 @@
       e.target.submit();
     });
     </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const colorSelect = document.getElementById("color-select");
+      if (colorSelect) {
+        colorSelect.addEventListener("change", function () {
+          if (this.value === "add_new") {
+            window.location.href = "/add_color";
+          }
+        });
+      }
+    });
+    </script>
+
 
 </body>
 </html>

@@ -49,6 +49,12 @@ class ModelForm(FlaskForm):
     description = TextAreaField('Описание модели')
     submit = SubmitField('Добавить модель')
 
+# 🎨 Форма для добавления нового цвета
+class ColorForm(FlaskForm):
+    code = StringField("Код цвета (две цифры)", validators=[DataRequired()])
+    name = StringField("Название цвета", validators=[DataRequired()])
+    description = TextAreaField("Описание (необязательно)")
+    submit = SubmitField("Добавить цвет")
 
 
 # 🔹 Форма для редактирования Артикула

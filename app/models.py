@@ -83,3 +83,16 @@ class Model(db.Model):
 
     def __repr__(self):
         return f"<Model {self.code} - {self.name}>"
+
+# 🎨 Модель Color — для хранения цветов, используемых в артикулах
+class Color(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Двузначный код цвета, отображаемый в артикуле (например, '01', '99')
+    code = db.Column(db.String(2), nullable=False, unique=True)
+
+    # Название цвета (например: "Белый матовый")
+    name = db.Column(db.String(50), nullable=False, unique=True)
+
+    # Описание (необязательно, можно использовать при отображении)
+    description = db.Column(db.Text)

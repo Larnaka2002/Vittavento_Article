@@ -3,8 +3,8 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 
 # Импорты проекта
 from app import db
-from app.models import View, Category, Model, Article
-from app.forms import ViewForm, CategoryForm, ModelForm, EditArticleForm
+from app.models import View, Category, Model, Article, Color
+from app.forms import ViewForm, CategoryForm, ModelForm, EditArticleForm, ColorForm
 
 # 🔹 Создание Blueprint
 main = Blueprint('main', __name__)
@@ -127,6 +127,31 @@ def add_model():
 
     return render_template("add_model.html", form=form)
 
+# --- ДОБАВЛЕНИЕ ЦВЕТА ---
+@main.route('/add_color', methods=['GET', 'POST'])
+def add_color():
+    form = ColorForm()
+
+    if form.validate_on_submit():
+        existing_by_code = Color.query.filter_by(code=form.code.data).first()
+        existing_by_name = Color.query.filter_by(name=form.name.data).first()
+
+        if existing_by_code or existing_by_name:
+            flash("Такой цвет уже существует!", "warning")
+        else:
+            new_color = Color(
+                code=form.code.data.zfill(2),  # Преобразуем в формат '01'
+                name=form.name.data,
+                description=form.description.data
+            )
+            db.session.add(new_color)
+            db.session.commit()
+            flash("Цвет успешно добавлен!", "success")
+            return redirect(url_for("main.index"))
+
+    return render_template("add_color.html", form=form)
+
+
 
 # --- ГЛАВНАЯ (ГЕНЕРАТОР) ---
 @main.route('/', methods=['GET', 'POST'])
@@ -150,11 +175,14 @@ def index():
         categories = []
         models = []
 
+    colors = Color.query.order_by(Color.code).all()
+
     return render_template(
         'index.html',
         views=views,
         categories=categories,
         models=models,
+        colors=colors,
         selected_view_id=view_id,
         selected_category_id=category_id,
         selected_model_code=model_code
