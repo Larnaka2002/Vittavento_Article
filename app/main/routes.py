@@ -6,6 +6,7 @@ from app import db
 from app.models import View, Category, Model, Article, Color
 from app.forms import ViewForm, CategoryForm, ModelForm, EditArticleForm, ColorForm
 
+
 # 🔹 Создание Blueprint
 main = Blueprint('main', __name__)
 
@@ -153,6 +154,8 @@ def add_color():
 
 
 
+
+
 # --- ГЛАВНАЯ (ГЕНЕРАТОР) ---
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -200,7 +203,16 @@ def generator():
     model_code = request.form.get('model')
     model_block = model_code if model_code and model_code.isdigit() else '00'
     color = request.form.get('color') or "00"
-    weight = request.form.get('weight') or "000"
+    # Получаем вес из формы
+    weight_input = request.form.get('weight')
+    try:
+        weight_real = float(weight_input)  # точный вес
+        weight_code = round(weight_real, 1)  # округлённый вес
+        weight_str = str(weight_code).replace('.', '')  # без точки, для вставки в артикул
+    except:
+        flash('Ошибка: вес указан некорректно.', 'danger')
+        return redirect(url_for('main.index'))
+
     blocks = request.form.get('blocks') or "00"
     details = request.form.get('details') or "00"
     prefix = request.form.get('prefix') or "0"
@@ -219,7 +231,7 @@ def generator():
         view_id = None
 
     category_code = category_name[:2].upper() if category_name else "XX"
-    article_code = f"{view_symbol}{category_code}{level}-{model_block}{color}{weight}-{blocks}{details}-{prefix}"
+    article_code = f"{view_symbol}{category_code}{level}-{model_block}{color}{weight_str}-{blocks}{details}-{prefix}"
 
     if not article_code:
         flash('Ошибка: Код артикула пустой.', 'danger')
@@ -238,7 +250,13 @@ def generator():
                                selected_view_id=view_id,
                                selected_category_name=category_name)
 
-    new_article = Article(code=article_code, description=description)
+    new_article = Article(
+        code=article_code,
+        description=description,
+        weight_real=weight_real,
+        weight_code=weight_code
+    )
+
     db.session.add(new_article)
     db.session.commit()
 

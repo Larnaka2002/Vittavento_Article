@@ -41,6 +41,7 @@
         <tr>
           <td>{{ article.code }}</td> <!-- Код артикула -->
           <td>{{ article.description }}</td> <!-- Описание артикула -->
+          <td>{{ article.weight_code }} кг</td>
           <td class="action-buttons">
             <!-- Ссылки на действия: Просмотр, QR-код, Штрихкод, PDF -->
             <a href="{{ url_for('main.view_article', article_id=article.id) }}">Просмотр</a>

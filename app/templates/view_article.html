@@ -16,6 +16,8 @@
     <div class="description-block">
         <p><strong>Код артикула:</strong> {{ article.code }}</p>
         <p><strong>Описание артикула:</strong> {{ article.description or 'Описание отсутствует' }}</p>
+        <p><strong>Вес (округлённый):</strong> {{ article.weight_code }} кг</p>
+        <p><strong>Вес (точный):</strong> {{ article.weight_real }} кг</p>
     </div>
 
     <!-- Информация о Виде изделия -->

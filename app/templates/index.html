@@ -84,15 +84,26 @@
         </div>
 
 
-        <!-- ВЕС -->
-        <div class="symbol-block group group-3">
-          <select name="weight" class="symbol-select">
-            <option>123</option>
-            <option>345</option>
-          </select>
+        <!-- ВЕС (один блок, реагирующий на клик) -->
+        <div class="symbol-block group triple-symbol" onclick="toggleWeightInput()" style="position: relative;">
+          <span id="weight_display" class="symbol-display">---</span>
+
+          <!-- Скрытое поле отображения и ввода -->
+          <input
+            type="number"
+            step="0.001"
+            min="0"
+            max="99.999"
+            id="weight_input"
+            name="weight"
+            placeholder="27.330"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                   background-color: white; color: black; font-size: 1.2em;
+                   border: none; text-align: center; display: none; border-radius: 6px;"
+            onblur="applyWeight()"
+          >
         </div>
 
-        <div class="dash">-</div>
 
         <!-- БЛОК -->
         <div class="symbol-block group group-2">
@@ -299,6 +310,31 @@
       }
     });
     </script>
+
+    <script>
+      const input = document.getElementById('weight_input');
+      const display = document.getElementById('weight_display');
+
+      function toggleWeightInput() {
+        input.style.display = 'block';
+        input.focus();
+      }
+
+      function applyWeight() {
+        const value = parseFloat(input.value);
+        if (!isNaN(value)) {
+          const rounded = Math.round(value * 10); // например: 27.330 → 273.3 → 273
+          display.textContent = rounded.toString().padStart(3, '0');
+        } else {
+          display.textContent = '---';
+        }
+        input.style.display = 'none';
+      }
+    </script>
+
+
+
+
 
 
 </body>

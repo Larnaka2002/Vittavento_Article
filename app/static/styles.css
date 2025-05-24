@@ -60,6 +60,12 @@ body {
 .group-2 { min-width: 120px; }
 .group-3 { min-width: 180px; }
 
+/* Специальный блок шириной в 3 символа (для веса) */
+.triple-symbol {
+    min-width: 180px;
+}
+
+
 /* Выравнивание символов в select-блоках */
 .group-2 select.symbol-select {
     letter-spacing: 20px;

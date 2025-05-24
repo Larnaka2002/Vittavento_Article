@@ -41,17 +41,19 @@ class Category(db.Model):
 
 # 🔹 Модель "Артикул изделия"
 class Article(db.Model):
-    # Уникальный идентификатор артикула
     id = db.Column(db.Integer, primary_key=True)
-
-    # Код артикула (обязательно уникальный)
     code = db.Column(db.String(64), nullable=False, unique=True)
-
-    # Краткое описание артикула (опционально)
     description = db.Column(db.String(256))
+
+    # Точный вес (например, 74.637)
+    weight_real = db.Column(db.Float(precision=5), nullable=False)
+
+    # Округлённый вес (например, 74.6)
+    weight_code = db.Column(db.Float(precision=1), nullable=False)
 
     def __repr__(self):
         return f'<Article id={self.id} code={self.code}>'
+
 
 # 🔧 Модель изделия — привязана к виду и категории, используется в артикулах (2 цифры: 01, 12 и т.д.)
 class Model(db.Model):
@@ -96,3 +98,4 @@ class Color(db.Model):
 
     # Описание (необязательно, можно использовать при отображении)
     description = db.Column(db.Text)
+
