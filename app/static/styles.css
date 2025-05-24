@@ -376,4 +376,24 @@ body {
     background-color: #f44336;
 }
 
+/* Индивидуальные ширины колонок таблицы */
+.article-table td:nth-child(1),
+.article-table th:nth-child(1) {
+    min-width: 220px;  /* Артикул */
+}
 
+.article-table td:nth-child(2),
+.article-table th:nth-child(2) {
+    min-width: 300px;  /* Описание */
+}
+
+.article-table td:nth-child(3),
+.article-table th:nth-child(3) {
+    min-width: 100px;  /* Вес */
+    text-align: center;
+}
+
+.article-table td:nth-child(4),
+.article-table th:nth-child(4) {
+    min-width: 220px;  /* Действия */
+}
