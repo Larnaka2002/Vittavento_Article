@@ -29,5 +29,8 @@ def create_app():
     from app.main.routes import main
     app.register_blueprint(main)
 
+    from app import models  # 📌 Обеспечивает регистрацию всех моделей в контексте миграций
+
+
     # Возвращение настроенного приложения
     return app

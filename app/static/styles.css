@@ -60,6 +60,12 @@ body {
 .group-2 { min-width: 120px; }
 .group-3 { min-width: 180px; }
 
+/* Специальный блок шириной в 3 символа (для веса) */
+.triple-symbol {
+    min-width: 180px;
+}
+
+
 /* Выравнивание символов в select-блоках */
 .group-2 select.symbol-select {
     letter-spacing: 20px;
@@ -340,3 +346,54 @@ body {
     height: 60px;
 }
 
+/* ================== Flash и контейнер ================== */
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.flash-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.flash {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+.flash.success {
+    background-color: #4caf50;
+}
+
+.flash.warning {
+    background-color: #f44336;
+}
+
+/* Индивидуальные ширины колонок таблицы */
+.article-table td:nth-child(1),
+.article-table th:nth-child(1) {
+    min-width: 220px;  /* Артикул */
+}
+
+.article-table td:nth-child(2),
+.article-table th:nth-child(2) {
+    min-width: 300px;  /* Описание */
+}
+
+.article-table td:nth-child(3),
+.article-table th:nth-child(3) {
+    min-width: 100px;  /* Вес */
+    text-align: center;
+}
+
+.article-table td:nth-child(4),
+.article-table th:nth-child(4) {
+    min-width: 220px;  /* Действия */
+}
