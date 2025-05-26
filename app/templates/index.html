@@ -10,6 +10,13 @@
     </style>
 </head>
 <body>
+  {% if current_user.is_authenticated %}
+    <div class="admin-panel">
+      <a href="{{ url_for('admin.index') }}" class="admin-link">🛠 Админка</a>
+      <a href="{{ url_for('auth.logout') }}" class="admin-link">⏏ Выход</a>
+    </div>
+  {% endif %}
+
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}

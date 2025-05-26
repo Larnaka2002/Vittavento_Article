@@ -397,3 +397,39 @@ body {
 .article-table th:nth-child(4) {
     min-width: 220px;  /* Действия */
 }
+
+.admin-link {
+  background-color: #444;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-left: 10px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+.admin-link:hover {
+  background-color: #222;
+}
+
+.admin-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.admin-link {
+  background-color: #444;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-left: 10px;
+  font-weight: bold;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+.admin-link:hover {
+  background-color: #222;
+}
