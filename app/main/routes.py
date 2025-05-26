@@ -201,8 +201,12 @@ def index():
 
 # --- ГЕНЕРАЦИЯ АРТИКУЛА ---
 
+# --- ГЕНЕРАЦИЯ АРТИКУЛА ---
+
 @main.route('/generator', methods=['POST'])
 def generator():
+    from flask import session
+
     # 🔹 Получение значений из формы
     view_id = request.form.get('view')
     category_name = request.form.get('category')
@@ -226,7 +230,7 @@ def generator():
         try:
             weight_real = float(weight_input)
             weight_code = round(weight_real, 1)
-            weight_str = str(weight_code).replace('.', '')
+            weight_str = str(int(weight_code * 10)).zfill(3)
         except:
             flash('Ошибка: вес указан некорректно.', 'danger')
             return redirect(url_for('main.index'))
@@ -248,8 +252,8 @@ def generator():
                 used_articles.append(a.code)
 
         weight_real = round(total_weight_real, 3)
-        weight_code = round(weight_real * 10)
-        weight_str = str(weight_code).zfill(3)
+        weight_code = round(weight_real, 1)
+        weight_str = str(int(weight_code * 10)).zfill(3)
 
     # 🔹 Символ вида
     views = View.query.order_by(View.name).all()
@@ -303,8 +307,10 @@ def generator():
     db.session.commit()
 
     # 🔹 Очистка выбранных компонентов
-    session.pop('selected_components', None)
-    session.pop('selected_details', None)
+    # Очищаем session только при генерации детали (уровень 4)
+    if level == "4":
+        session.pop('selected_components', None)
+        session.pop('selected_details', None)
 
     flash(f'Артикул {article_code} успешно создан.', 'success')
     return redirect(url_for('main.list_articles'))
