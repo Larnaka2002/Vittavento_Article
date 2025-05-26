@@ -52,15 +52,17 @@
         </div>
 
 
-        <!-- УРОВЕНЬ -->
-        <div class="symbol-block single">
+        <!-- УРОВЕНЬ ИЕРАРХИИ -->
+        <!-- ВЫБОР УРОВНЯ -->
+        <div class="symbol-block group-1">
           <select name="level" class="symbol-select">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
+            <option value="1" {% if selected_level == '1' %}selected{% endif %}>1</option>
+            <option value="2" {% if selected_level == '2' %}selected{% endif %}>2</option>
+            <option value="3" {% if selected_level == '3' %}selected{% endif %}>3</option>
+            <option value="4" {% if selected_level == '4' or not selected_level %}selected{% endif %}>4</option>
           </select>
         </div>
+
 
         <div class="dash">-</div>
 
@@ -105,21 +107,16 @@
         </div>
 
 
-        <!-- БЛОК -->
-        <div class="symbol-block group group-2">
-          <select name="blocks" class="symbol-select">
-            <option>01</option>
-            <option>02</option>
-          </select>
+        <!-- ВЫБОР КОМПОНЕНТОВ (2 и 3) -->
+        <div class="symbol-block group group-2" onclick="location.href='{{ url_for('main.select_components') }}'" style="cursor: pointer;">
+          {{ selected_components_count or '00' }}
         </div>
 
-        <!-- ДЕТАЛИ -->
-        <div class="symbol-block group group-2">
-          <select name="details" class="symbol-select">
-            <option>02</option>
-            <option>03</option>
-          </select>
+        <!-- ВЫБОР ДЕТАЛЕЙ (4) -->
+        <div class="symbol-block group group-2" onclick="location.href='{{ url_for('main.select_details') }}'" style="cursor: pointer;">
+          {{ selected_details_count or '00' }}
         </div>
+
 
         <div class="dash">-</div>
       </div>

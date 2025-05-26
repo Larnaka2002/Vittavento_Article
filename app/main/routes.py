@@ -1,10 +1,11 @@
-# Импорты Flask
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+
 
 # Импорты проекта
 from app import db
 from app.models import View, Category, Model, Article, Color
 from app.forms import ViewForm, CategoryForm, ModelForm, EditArticleForm, ColorForm
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, session
+
 
 
 # 🔹 Создание Blueprint
@@ -163,6 +164,7 @@ def index():
     view_id = request.form.get('view', type=int)
     category_id = request.form.get('category', type=int)
     model_code = request.form.get('model')
+    level = request.form.get('level') or "4"
 
     # Категории по выбранному виду
     if view_id:
@@ -179,6 +181,8 @@ def index():
         models = []
 
     colors = Color.query.order_by(Color.code).all()
+    selected_components = session.get('selected_components', [])
+    selected_details = session.get('selected_details', [])
 
     return render_template(
         'index.html',
@@ -188,40 +192,70 @@ def index():
         colors=colors,
         selected_view_id=view_id,
         selected_category_id=category_id,
-        selected_model_code=model_code
+        selected_model_code=model_code,
+        selected_level=level,  # 👈 обязательно для отображения в <select>
+        selected_components_count=str(len(selected_components)).zfill(2),
+        selected_details_count=str(len(selected_details)).zfill(2)
     )
-
 
 
 # --- ГЕНЕРАЦИЯ АРТИКУЛА ---
 
 @main.route('/generator', methods=['POST'])
 def generator():
+    # 🔹 Получение значений из формы
     view_id = request.form.get('view')
     category_name = request.form.get('category')
     level = request.form.get('level') or "0"
+    is_manual_weight = level == "4"
     model_code = request.form.get('model')
     model_block = model_code if model_code and model_code.isdigit() else '00'
     color = request.form.get('color') or "00"
-    # Получаем вес из формы
-    weight_input = request.form.get('weight')
-    try:
-        weight_real = float(weight_input)  # точный вес
-        weight_code = round(weight_real, 1)  # округлённый вес
-        weight_str = str(weight_code).replace('.', '')  # без точки, для вставки в артикул
-    except:
-        flash('Ошибка: вес указан некорректно.', 'danger')
-        return redirect(url_for('main.index'))
-
     blocks = request.form.get('blocks') or "00"
     details = request.form.get('details') or "00"
     prefix = request.form.get('prefix') or "0"
-    description = request.form.get('article_description')
+    description = request.form.get('article_description') or ""
 
+    # 🔹 Подготовка расчёта веса и списка дочерних артикулов
+    used_articles = []
+    total_weight_real = 0.0
+
+    if is_manual_weight:
+        # Ручной ввод веса для level = 4
+        weight_input = request.form.get('weight')
+        try:
+            weight_real = float(weight_input)
+            weight_code = round(weight_real, 1)
+            weight_str = str(weight_code).replace('.', '')
+        except:
+            flash('Ошибка: вес указан некорректно.', 'danger')
+            return redirect(url_for('main.index'))
+    else:
+        # Автоматический расчёт на основе session
+        selected_components = session.get('selected_components', [])
+        selected_details = session.get('selected_details', [])
+
+        if selected_components:
+            components = Article.query.filter(Article.id.in_(selected_components)).all()
+            for a in components:
+                total_weight_real += a.weight_real
+                used_articles.append(a.code)
+
+        if selected_details:
+            details_list = Article.query.filter(Article.id.in_(selected_details)).all()
+            for a in details_list:
+                total_weight_real += a.weight_real
+                used_articles.append(a.code)
+
+        weight_real = round(total_weight_real, 3)
+        weight_code = round(weight_real * 10)
+        weight_str = str(weight_code).zfill(3)
+
+    # 🔹 Символ вида
     views = View.query.order_by(View.name).all()
+    view_symbol = "X"
     categories = []
 
-    view_symbol = "X"
     if view_id and view_id.isdigit():
         view = View.query.get(int(view_id))
         if view:
@@ -231,6 +265,8 @@ def generator():
         view_id = None
 
     category_code = category_name[:2].upper() if category_name else "XX"
+
+    # 🔹 Финальный код артикула
     article_code = f"{view_symbol}{category_code}{level}-{model_block}{color}{weight_str}-{blocks}{details}-{prefix}"
 
     if not article_code:
@@ -250,19 +286,28 @@ def generator():
                                selected_view_id=view_id,
                                selected_category_name=category_name)
 
+    # 🔹 Вставка компонентов в описание
+    if used_articles:
+        description += f"\nКомпоненты: {', '.join(used_articles)}"
+
+    # 🔹 Сохранение в базу с level
     new_article = Article(
         code=article_code,
         description=description,
         weight_real=weight_real,
-        weight_code=weight_code
+        weight_code=weight_code,
+        level=level
     )
 
     db.session.add(new_article)
     db.session.commit()
 
+    # 🔹 Очистка выбранных компонентов
+    session.pop('selected_components', None)
+    session.pop('selected_details', None)
+
     flash(f'Артикул {article_code} успешно создан.', 'success')
     return redirect(url_for('main.list_articles'))
-
 
 # --- ПРОСМОТР И РЕДАКТИРОВАНИЕ ---
 
@@ -314,3 +359,34 @@ def get_prefix():
     existing_prefixes = [int(a.code.split('-')[-1]) for a in matches if a.code.split('-')[-1].isdigit()]
     next_prefix = max(existing_prefixes, default=0) + 1
     return jsonify({'prefix': next_prefix})
+
+
+# --- ВЫБОР КОМПОНЕНТОВ ---
+@main.route('/select_components', methods=['GET', 'POST'])
+def select_components():
+    # Отображаем все артикулы уровня 2 и 3
+    articles = Article.query.filter(Article.level.in_(["2", "3"])).order_by(Article.code).all()
+
+    if request.method == 'POST':
+        # Сохраняем выбранные ID в session
+        selected_ids = request.form.getlist('component_ids')
+        session['selected_components'] = selected_ids
+        flash(f"Выбрано компонентов: {len(selected_ids)}", 'success')
+        return redirect(url_for('main.index'))
+
+    return render_template('select_components.html', articles=articles)
+
+
+# --- ВЫБОР ДЕТАЛЕЙ ---
+@main.route('/select_details', methods=['GET', 'POST'])
+def select_details():
+    # Отображаем все артикулы уровня 4
+    articles = Article.query.filter_by(level="4").order_by(Article.code).all()
+
+    if request.method == 'POST':
+        selected_ids = request.form.getlist('detail_ids')
+        session['selected_details'] = selected_ids
+        flash(f"Выбрано деталей: {len(selected_ids)}", 'success')
+        return redirect(url_for('main.index'))
+
+    return render_template('select_details.html', articles=articles)

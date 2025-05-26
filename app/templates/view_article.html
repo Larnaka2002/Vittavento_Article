@@ -15,7 +15,11 @@
     <!-- Информация об артикулах -->
     <div class="description-block">
         <p><strong>Код артикула:</strong> {{ article.code }}</p>
-        <p><strong>Описание артикула:</strong> {{ article.description or 'Описание отсутствует' }}</p>
+        <!-- Описание с сохранением форматирования -->
+        <p><strong>Описание артикула:</strong></p>
+        <div class="description-block" style="white-space: pre-line;">
+          {{ article.description or 'Описание отсутствует' }}
+        </div>
         <p><strong>Вес (округлённый):</strong> {{ article.weight_code }} кг</p>
         <p><strong>Вес (точный):</strong> {{ article.weight_real }} кг</p>
     </div>

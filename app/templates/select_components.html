@@ -1,0 +1,28 @@
+<h1>Выбор компонентов иерархий 2 и 3</h1>
+<form method="POST">
+  <table class="article-table">
+    <thead>
+      <tr>
+        <th>✓</th>
+        <th>Артикул</th>
+        <th>Описание</th>
+        <th>Вес</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for article in articles %}
+      <tr>
+        <td><input type="checkbox" name="component_ids" value="{{ article.id }}"></td>
+        <td>{{ article.code }}</td>
+        <td>{{ article.description }}</td>
+        <td>{{ article.weight_real }} кг</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="button-container">
+    <button type="submit" class="start-button">Выбрать</button>
+    <a href="{{ url_for('main.index') }}" class="back-button">← Назад</a>
+  </div>
+</form>

@@ -48,6 +48,9 @@ class Article(db.Model):
     # Точный вес (например, 74.637)
     weight_real = db.Column(db.Float(precision=5), nullable=False)
 
+    # Уровень артикула: 1 — сборка, 2–3 — компоненты, 4 — отдельные детали
+    level = db.Column(db.String(1), nullable=False, default="0")
+
     # Округлённый вес (например, 74.6)
     weight_code = db.Column(db.Float(precision=1), nullable=False)
 
