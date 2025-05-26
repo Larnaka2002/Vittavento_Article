@@ -155,8 +155,6 @@ def add_color():
 
 
 
-
-
 # --- ГЛАВНАЯ (ГЕНЕРАТОР) ---
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -201,8 +199,6 @@ def index():
 
 # --- ГЕНЕРАЦИЯ АРТИКУЛА ---
 
-# --- ГЕНЕРАЦИЯ АРТИКУЛА ---
-
 @main.route('/generator', methods=['POST'])
 def generator():
     from flask import session
@@ -228,9 +224,10 @@ def generator():
         # Ручной ввод веса для level = 4
         weight_input = request.form.get('weight')
         try:
-            weight_real = float(weight_input)
-            weight_code = round(weight_real, 1)
-            weight_str = str(int(weight_code * 10)).zfill(3)
+            weight_real = float(weight_input)  # точный вес, с 3 знаками позже
+            weight_code = round(weight_real, 1)  # округлённый вес (пример: 60.0)
+            weight_str = "{:05.1f}".format(weight_code).replace(".", "")  # '060'
+
         except:
             flash('Ошибка: вес указан некорректно.', 'danger')
             return redirect(url_for('main.index'))
@@ -238,6 +235,8 @@ def generator():
         # Автоматический расчёт на основе session
         selected_components = session.get('selected_components', [])
         selected_details = session.get('selected_details', [])
+        blocks = str(len(selected_components)).zfill(2)
+        details = str(len(selected_details)).zfill(2)
 
         if selected_components:
             components = Article.query.filter(Article.id.in_(selected_components)).all()
@@ -251,9 +250,9 @@ def generator():
                 total_weight_real += a.weight_real
                 used_articles.append(a.code)
 
-        weight_real = round(total_weight_real, 3)
-        weight_code = round(weight_real, 1)
-        weight_str = str(int(weight_code * 10)).zfill(3)
+        weight_real = round(total_weight_real, 3)  # точный вес (3 знака)
+        weight_code = round(weight_real, 1)  # округлённый вес (1 знак)
+        weight_str = "{:05.1f}".format(weight_code).replace(".", "")  # '060'
 
     # 🔹 Символ вида
     views = View.query.order_by(View.name).all()
