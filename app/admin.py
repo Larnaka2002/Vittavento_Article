@@ -12,18 +12,27 @@ from app.models import View, Category, Article, User, Color, Model
 # 🔐 Защищённая админ-панель — доступ только авторизованным
 class SecureModelView(ModelView):
     def is_accessible(self):
-        return current_user.is_authenticated  # Можно добавить проверку роли
+        return current_user.is_authenticated and current_user.role == 'admin'
 
     def inaccessible_callback(self, name, **kwargs):
-        flash("Требуется вход для доступа к админке.", "warning")
+        flash("У вас нет прав для доступа к этому разделу.", "warning")
+        return redirect(url_for('auth.login'))
+
+class ArticleManagerView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.role in ['admin', 'manager']
+
+    def inaccessible_callback(self, name, **kwargs):
+        flash("У вас нет доступа к этому разделу.", "warning")
         return redirect(url_for('auth.login'))
 
 
 class SecureAdminIndexView(AdminIndexView):
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.role == 'admin'
 
     def inaccessible_callback(self, name, **kwargs):
+        flash("Доступ запрещён. Войдите как администратор.", "danger")
         return redirect(url_for('auth.login'))
 
 
@@ -36,7 +45,7 @@ def init_admin(app):
     admin.add_view(SecureModelView(View, db.session, name="Виды"))
     admin.add_view(SecureModelView(Category, db.session, name="Категории"))
     admin.add_view(SecureModelView(Model, db.session, name="Модели"))
-    admin.add_view(SecureModelView(Color, db.session, name="Цвета"))
-    admin.add_view(SecureModelView(Article, db.session, name="Артикулы"))
+    admin.add_view(ArticleManagerView(Article, db.session, name="Артикулы"))
+    admin.add_view(ArticleManagerView(Color, db.session, name="Цвета"))
     admin.add_view(SecureModelView(User, db.session, name="Пользователи"))
 
