@@ -433,3 +433,70 @@ body {
 .admin-link:hover {
   background-color: #222;
 }
+
+/* Стили таблицы */
+table.dataTable {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Артикул — шире */
+table.dataTable th:nth-child(1),
+table.dataTable td:nth-child(1) {
+  width: 15%;
+  white-space: nowrap;
+}
+
+/* Столбец "Вес" — сделаем немного шире */
+table.dataTable th:nth-child(3),
+table.dataTable td:nth-child(3) {
+  width: 8%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Единый стиль для шапки таблицы */
+table.dataTable thead {
+  background-color: #264653;   /* тёмно-синий */
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Дополнительно — стили для нижних ячеек таблицы */
+table.dataTable tbody tr:nth-child(even) {
+  background-color: #f6f9fc;
+}
+table.dataTable tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Стили только для таблицы компонентов */
+.components-table th:nth-child(2),
+.components-table td:nth-child(2) {
+  min-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.components-table th:nth-child(3),
+.components-table td:nth-child(3) {
+  text-align: left;
+}
+
+/* Столбец "Описание" в таблице компонентов — выравнивание слева */
+.components-table td:nth-child(3),
+.components-table th:nth-child(3) {
+  text-align: left !important;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.components-table th:nth-child(4),
+.components-table td:nth-child(4) {
+  min-width: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

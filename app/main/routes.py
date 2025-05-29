@@ -318,8 +318,19 @@ def generator():
 
 @main.route('/articles')
 def list_articles():
-    articles = Article.query.order_by(Article.id.desc()).all()
+    search_query = request.args.get('search', '')
+
+    query = Article.query
+
+    if search_query:
+        query = query.filter(
+            Article.code.ilike(f"%{search_query}%") |
+            Article.description.ilike(f"%{search_query}%")
+        )
+
+    articles = query.order_by(Article.id.desc()).all()
     return render_template('list_articles.html', articles=articles)
+
 
 
 @main.route('/view_article/<int:article_id>')

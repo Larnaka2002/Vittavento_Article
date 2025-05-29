@@ -3,31 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <title>Список артикулов</title>
-  <!-- Подключение основного файла стилей -->
+
+  <!-- Стили -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f7fafd;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+      padding: 8px;
+      width: 220px;
+    }
+
+    table.dataTable thead th {
+      background-color: #295d77;
+      color: white;
+      font-weight: 600;
+      border-bottom: 2px solid #ccc;
+      text-align: left;
+    }
+
+    table.dataTable tbody td {
+      border-bottom: 1px solid #ddd;
+      padding: 12px 10px;
+    }
+
+    table.dataTable tbody tr:nth-child(even) {
+      background-color: #f4f9fc;
+    }
+
+    table.dataTable tbody tr:hover {
+      background-color: #e9f1f8;
+    }
+
+    table.dataTable tfoot th {
+      font-weight: normal;
+    }
+
+    .action-buttons a {
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 0.9em;
+      color: #2b6cb0;
+      text-decoration: none;
+    }
+
+    .action-buttons a:hover {
+      text-decoration: underline;
+    }
+
+    .inline-form {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .pretty-input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      min-width: 300px;
+    }
+
+    .start-button, .back-button {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      background-color: #295d77;
+      color: white;
+      transition: 0.2s;
+    }
+
+    .start-button:hover, .back-button:hover {
+      background-color: #1c3f52;
+    }
+
+    .back-button {
+      margin-right: 10px;
+    }
+  </style>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
 
-  <!-- Блок для Flash-сообщений -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="flash-message {{ category }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-
-
   <div class="container">
-
-    <!-- Кнопка для возврата на генератор артикулов -->
+    <!-- Назад -->
     <a href="{{ url_for('main.index') }}" class="back-button">← Назад к генератору</a>
 
-    <!-- Заголовок страницы -->
+    <!-- Заголовок -->
     <h1>Список артикулов</h1>
 
-    <!-- Таблица с данными об артикуле -->
-    <table class="article-table">
+
+    <!-- Таблица -->
+    <table id="articlesTable" class="display" style="width: 100%;">
       <thead>
         <tr>
           <th>Артикул</th>
@@ -36,16 +133,13 @@
           <th>Действия</th>
         </tr>
       </thead>
-
       <tbody>
-        <!-- Перебор всех артикулов, полученных из базы данных -->
         {% for article in articles %}
         <tr>
-          <td>{{ article.code }}</td> <!-- Код артикула -->
-          <td>{{ article.description }}</td> <!-- Описание артикула -->
+          <td>{{ article.code }}</td>
+          <td>{{ article.description }}</td>
           <td>{{ article.weight_code }} кг</td>
           <td class="action-buttons">
-            <!-- Ссылки на действия: Просмотр, QR-код, Штрихкод, PDF -->
             <a href="{{ url_for('main.view_article', article_id=article.id) }}">Просмотр</a>
             <a href="#">QR</a>
             <a href="#">Штрихкод</a>
@@ -55,7 +149,38 @@
         {% endfor %}
       </tbody>
     </table>
-
   </div>
+
+  <script>
+    $(document).ready(function () {
+      const table = $('#articlesTable').DataTable({
+        orderCellsTop: true,
+        fixedHeader: true,
+        paging: false,
+        info: false,
+        language: {
+          search: "🔍 Поиск:",
+          zeroRecords: "Ничего не найдено",
+          emptyTable: "Нет данных",
+        }
+      });
+
+      // Добавляем фильтры под заголовками
+      $('#articlesTable thead tr').clone(true).appendTo('#articlesTable thead');
+      $('#articlesTable thead tr:eq(1) th').each(function (i) {
+        if (i < 3) {
+          $(this).html('<input type="text" placeholder="Фильтр..." style="width: 100%; padding: 4px;" />');
+          $('input', this).on('keyup change', function () {
+            if (table.column(i).search() !== this.value) {
+              table.column(i).search(this.value).draw();
+            }
+          });
+        } else {
+          $(this).html('');
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>

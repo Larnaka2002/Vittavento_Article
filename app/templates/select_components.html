@@ -1,122 +1,76 @@
-<style>
-  body {
-    background-color: #f3f6fa;
-    font-family: "Segoe UI", sans-serif;
-  }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Выбор компонентов</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
 
-  .selection-container {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 30px 40px;
-    background: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.05);
-    animation: fadeIn 0.3s ease;
-  }
+  <div class="container">
+    <h1>Выбор компонентов иерархий 2 и 3</h1>
 
-  h2 {
-    text-align: center;
-    font-size: 26px;
-    margin-bottom: 30px;
-    color: #2c3e50;
-    font-weight: 700;
-  }
+    <form method="POST">
+      <table id="componentsTable" class="display components-table" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>✓</th>
+            <th>Артикул</th>
+            <th>Описание</th>
+            <th>Вес</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for article in articles %}
+          <tr>
+            <td><input type="checkbox" name="component_ids" value="{{ article.id }}"></td>
+            <td>{{ article.code }}</td>
+            <td>{{ article.description }}</td>
+            <td>{{ article.weight_real }} кг</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    color: #2c3e50;
-  }
+      <div class="button-container">
+        <button type="submit" class="start-button">Выбрать</button>
+        <a href="{{ url_for('main.index') }}" class="back-button">← Назад</a>
+      </div>
+    </form>
+  </div>
 
-  th, td {
-    padding: 14px 18px;
-    text-align: left;
-    border-bottom: 1px solid #dfe6ec;
-    vertical-align: top;
-  }
+  <script>
+    $(document).ready(function () {
+      $('#componentsTable thead tr').clone(true).appendTo('#componentsTable thead');
+      $('#componentsTable thead tr:eq(1) th').each(function (i) {
+        if (i > 0 && i < 4) {
+          $(this).html('<input type="text" placeholder="Фильтр..." style="width: 100%; padding: 3px;" />');
+          $('input', this).on('keyup change', function () {
+            if (table.column(i).search() !== this.value) {
+              table.column(i).search(this.value).draw();
+            }
+          });
+        } else {
+          $(this).html('');
+        }
+      });
 
-  th {
-    background-color: #ecf3f9;
-    color: #2c3e50;
-    font-weight: 600;
-  }
+      const table = $('#componentsTable').DataTable({
+        orderCellsTop: true,
+        fixedHeader: true,
+        paging: false,
+        info: false,
+        language: {
+          search: "🔍 Поиск:",
+          zeroRecords: "Ничего не найдено",
+          emptyTable: "Нет данных"
+        }
+      });
+    });
+  </script>
 
-  tr:hover {
-    background-color: #f9fcff;
-    transition: 0.2s;
-  }
-
-  .btn-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 25px;
-  }
-
-  .btn-select {
-    background-color: #3c5d6f;
-    color: white;
-    padding: 10px 26px;
-    font-size: 16px;
-    font-weight: 500;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    transition: background-color 0.3s ease;
-  }
-
-  .btn-select:hover {
-    background-color: #2e4a59;
-  }
-
-  .back-link {
-    text-decoration: none;
-    color: #3c5d6f;
-    font-weight: 500;
-    font-size: 16px;
-    transition: color 0.2s;
-  }
-
-  .back-link:hover {
-    color: #1d2f3a;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
-
-<div class="selection-container">
-  <h2>Выбор компонентов иерархий 2 и 3</h2>
-
-  <form method="POST">
-    <table>
-      <thead>
-        <tr>
-          <th>✓</th>
-          <th>Артикул</th>
-          <th>Описание</th>
-          <th>Вес</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for article in articles %}
-        <tr>
-          <td><input type="checkbox" name="component_ids" value="{{ article.id }}"></td>
-          <td>{{ article.code }}</td>
-          <td>{{ article.description }}</td>
-          <td>{{ article.weight_real }} кг</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div class="btn-bar">
-      <button type="submit" class="btn-select">Выбрать</button>
-      <a href="{{ url_for('main.index') }}" class="back-link">← Назад</a>
-    </div>
-  </form>
-</div>
+</body>
+</html>
