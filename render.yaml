@@ -9,3 +9,5 @@ services:
         value: production
       - key: SECRET_KEY
         value: your_secret_key_here
+    postdeploy:
+      - flask db upgrade
