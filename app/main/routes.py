@@ -280,9 +280,18 @@ def generator():
                                selected_view_id=view_id,
                                selected_category_name=category_name)
 
-    existing = Article.query.filter_by(code=article_code).first()
-    if existing:
-        flash('Такой артикул уже существует!', 'warning')
+    # Автоинкремент префикса при совпадении артикула
+    original_prefix = int(prefix)
+    max_attempts = 50  # защита от бесконечного цикла
+
+    for attempt in range(max_attempts):
+        article_code = f"{view_symbol}{category_code}{level}-{model_block}{color}{weight_str}-{blocks}{details}-{str(original_prefix + attempt).zfill(1)}"
+        existing = Article.query.filter_by(code=article_code).first()
+        if not existing:
+            prefix = str(original_prefix + attempt).zfill(1)
+            break
+    else:
+        flash('Ошибка: не удалось сгенерировать уникальный артикул после 50 попыток.', 'danger')
         return render_template('index.html',
                                views=views,
                                categories=categories,
