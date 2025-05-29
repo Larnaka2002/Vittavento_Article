@@ -4,9 +4,9 @@ services:
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+    preDeployCommand: flask db upgrade
     envVars:
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
         value: your_secret_key_here
-    postDeployCommand: flask db upgrade
